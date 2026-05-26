@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#FF8C00">
+    <meta name="theme-color" content="#6C5CE7">
     <title>Konuşuyorum & Öğreniyorum 🌈</title>
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    <meta name="description" content="Çocuklar için interaktif AAC ve Eğitim uygulaması.">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
     
     <!-- Canvas Confetti Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --primary: #FF8C00; /* Canlı Turuncu */
-            --secondary: #4CAF50; /* Doğa Yeşili */
-            --accent: #2196F3; /* Deniz Mavisi */
-            --yellow: #FFD700; /* Güneş Sarısı */
-            --bg: #F0F4F8;
-            --text: #2C3E50;
+            --primary: #6C5CE7; /* Modern Mor */
+            --secondary: #00B894; /* Mint Yeşili */
+            --accent: #FF7675; /* Mercan */
+            --yellow: #FDCB6E; /* Parlak Sarı */
+            --blue: #0984E3; /* Canlı Mavi */
+            --bg: #F9FAFB;
+            --text: #2D3436;
             --white: #FFFFFF;
+            --shadow: 0 10px 25px rgba(108, 92, 231, 0.1);
         }
 
         * {
@@ -38,8 +39,9 @@
         body {
             background-color: var(--bg);
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(255, 140, 0, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(33, 150, 243, 0.05) 0%, transparent 40%);
+                url("https://www.transparenttextures.com/patterns/cubes.png"),
+                linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
@@ -48,7 +50,8 @@
 
         /* Header */
         .header {
-            background: var(--white);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             padding: 15px 20px;
             display: flex;
             align-items: center;
@@ -56,36 +59,34 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            border-bottom-left-radius: 25px;
-            border-bottom-right-radius: 25px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.05);
+            border-bottom: 3px solid rgba(255,255,255,0.3);
         }
 
         .header h1 {
             font-family: 'Baloo 2', cursive;
-            font-size: 1.6rem;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
+            font-size: 1.8rem;
+            background: linear-gradient(45deg, var(--primary), var(--blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-weight: 800;
         }
 
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-        }
+        .nav-buttons { display: flex; gap: 12px; }
 
         .btn-round {
-            background: #F0F2F5;
+            background: var(--white);
             border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 15px;
-            font-size: 1.3rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 18px;
+            font-size: 1.5rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: var(--shadow);
         }
 
         .btn-round:active { transform: scale(0.9); }
@@ -95,95 +96,101 @@
 
         /* Main Container */
         .container {
-            padding: 20px;
-            max-width: 800px;
+            padding: 25px 20px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
         /* Grid System */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 20px;
         }
 
         /* Cards */
         .card {
             background: var(--white);
-            border-radius: 25px;
-            padding: 20px 10px;
+            border-radius: 30px;
+            padding: 25px 15px;
             text-align: center;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow);
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 4px solid transparent;
+            border: 5px solid transparent;
             position: relative;
+            overflow: hidden;
         }
 
-        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(108, 92, 231, 0.2); }
         .card:active { transform: scale(0.95); }
         
         .card.person { border-color: var(--primary); }
-        .card.category { border-color: var(--accent); }
+        .card.category { border-color: var(--blue); }
         .card.item { border-color: var(--secondary); }
         .card.quiz { border-color: var(--yellow); }
 
         .card-img {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 12px;
-            border-radius: 20px;
-            background: #F8F9FA;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 15px;
+            border-radius: 25px;
+            background: #F0F3F7;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 3rem;
             object-fit: cover;
+            border: 2px solid rgba(0,0,0,0.03);
         }
 
         .card-title {
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: var(--text);
+            font-family: 'Baloo 2', cursive;
         }
 
         /* Quiz Styles */
         .quiz-container {
             background: var(--white);
-            border-radius: 30px;
-            padding: 30px 20px;
+            border-radius: 35px;
+            padding: 40px 25px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border: 8px solid var(--yellow);
         }
 
         .quiz-question {
             font-family: 'Baloo 2', cursive;
-            font-size: 1.8rem;
-            margin-bottom: 25px;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
             color: var(--primary);
+            line-height: 1.2;
         }
 
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .option-btn {
             background: #F8F9FA;
-            border: 3px solid #EEE;
-            padding: 20px;
-            border-radius: 20px;
-            font-size: 1.2rem;
-            font-weight: 600;
+            border: 4px solid #EDF2F7;
+            padding: 25px;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
+            font-family: 'Baloo 2', cursive;
         }
 
-        .option-btn:hover { border-color: var(--accent); background: #E3F2FD; }
-        .option-btn.correct { border-color: var(--secondary); background: #E8F5E9; }
-        .option-btn.wrong { border-color: var(--danger); background: #FFEBEE; animation: shake 0.4s; }
+        .option-btn:hover { border-color: var(--blue); background: #EBF8FF; }
+        .option-btn.correct { border-color: var(--secondary); background: #E6FFFA; transform: scale(1.05); }
+        .option-btn.wrong { border-color: var(--accent); background: #FFF5F5; animation: shake 0.4s; }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -192,58 +199,82 @@
         }
 
         .next-btn {
-            background: var(--accent);
+            background: var(--blue);
             color: white;
             border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: 700;
+            padding: 18px 50px;
+            border-radius: 60px;
+            font-size: 1.4rem;
+            font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+            box-shadow: 0 8px 20px rgba(9, 132, 227, 0.3);
+            transition: all 0.3s;
+            font-family: 'Baloo 2', cursive;
         }
 
+        .next-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(9, 132, 227, 0.4); }
+
         /* Form Styles */
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-card {
+            background: var(--white);
+            padding: 35px;
+            border-radius: 35px;
+            box-shadow: var(--shadow);
+            border: 4px solid var(--primary);
+        }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 10px; font-weight: 700; font-size: 1.1rem; color: var(--primary); }
         input[type="text"], select {
             width: 100%;
-            padding: 12px 15px;
-            border-radius: 12px;
-            border: 2px solid #DDD;
-            font-size: 1rem;
+            padding: 15px 20px;
+            border-radius: 18px;
+            border: 3px solid #EDF2F7;
+            font-size: 1.1rem;
+            transition: border-color 0.3s;
+            background: #F8FAFC;
         }
+        input:focus { border-color: var(--primary); outline: none; }
+        
         .btn-save {
             width: 100%;
-            padding: 15px;
-            border-radius: 15px;
+            padding: 18px;
+            border-radius: 20px;
             border: none;
             background: var(--secondary);
             color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-weight: 800;
+            font-size: 1.3rem;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 15px;
+            box-shadow: 0 6px 15px rgba(0, 184, 148, 0.3);
+            font-family: 'Baloo 2', cursive;
         }
 
         .btn-delete {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(255,0,0,0.1);
-            color: #FF5252;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 118, 117, 0.15);
+            color: var(--accent);
             border: none;
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
+            width: 35px;
+            height: 35px;
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
+        .btn-delete:hover { background: var(--accent); color: white; }
 
         /* Mobile */
         @media (max-width: 480px) {
             .options-grid { grid-template-columns: 1fr; }
-            .grid { grid-template-columns: repeat(2, 1fr); }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .header h1 { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -253,9 +284,12 @@
     <script>
         // ==================== DATABASE ====================
         let db;
+        const DB_NAME = 'KonusuyorumPremiumDB';
+        const DB_VERSION = 1;
+
         function initDB() {
             return new Promise((resolve, reject) => {
-                const request = indexedDB.open('KonusuyorumGelismişDB', 3);
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains('people')) db.createObjectStore('people', { keyPath: 'id' });
@@ -270,17 +304,18 @@
             getAll: () => new Promise(r => {
                 const tx = db.transaction(storeName, 'readonly');
                 const req = tx.objectStore(storeName).getAll();
-                req.onsuccess = () => r(req.result);
+                req.onsuccess = () => r(req.result || []);
             }),
             get: (id) => new Promise(r => {
                 const tx = db.transaction(storeName, 'readonly');
                 const req = tx.objectStore(storeName).get(id);
                 req.onsuccess = () => r(req.result);
             }),
-            save: (data) => new Promise(r => {
+            save: (data) => new Promise((r, rej) => {
                 const tx = db.transaction(storeName, 'readwrite');
                 tx.objectStore(storeName).put(data);
                 tx.oncomplete = () => r();
+                tx.onerror = (e) => rej(e);
             }),
             delete: (id) => new Promise(r => {
                 const tx = db.transaction(storeName, 'readwrite');
@@ -297,9 +332,12 @@
         const navigate = (hash) => { window.location.hash = hash; };
         
         function speak(text) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel(); // Mevcut sesi durdur
             const msg = new SpeechSynthesisUtterance(text);
             msg.lang = 'tr-TR';
-            msg.rate = 0.9;
+            msg.rate = 0.85;
+            msg.pitch = 1.1; // Daha çocuksu bir ses tonu
             window.speechSynthesis.speak(msg);
         }
 
@@ -308,37 +346,41 @@
 
         async function render() {
             const hash = window.location.hash || '#/';
-            app.innerHTML = '<div style="text-align:center;padding:50px">Yükleniyor... 🎈</div>';
+            app.innerHTML = '<div style="text-align:center;padding:100px;font-size:2rem">🎈</div>';
 
-            if (hash === '#/') {
-                const people = await peopleDB.getAll();
-                renderHome(people);
-            } else if (hash === '#/quizzes') {
-                const quizzes = await quizDB.getAll();
-                renderQuizList(quizzes);
-            } else if (hash.startsWith('#/quiz-play/')) {
-                const id = hash.split('/')[2];
-                const quizzes = await quizDB.getAll();
-                const index = quizzes.findIndex(q => q.id === id);
-                renderQuizPlay(quizzes, index);
-            } else if (hash.startsWith('#/person/')) {
-                const person = await peopleDB.get(hash.split('/')[2]);
-                renderPerson(person);
-            } else if (hash.startsWith('#/category/')) {
-                const parts = hash.split('/');
-                const person = await peopleDB.get(parts[2]);
-                const category = person.categories.find(c => c.id === parts[3]);
-                renderCategory(person, category);
-            } else if (hash === '#/add-person') {
-                renderForm('Yeni Kişi', (e) => savePerson(e), [{id:'name', label:'İsim'}, {id:'img', label:'Fotoğraf', type:'file'}]);
-            } else if (hash === '#/add-quiz') {
-                renderQuizForm();
-            } else if (hash.startsWith('#/add-category/')) {
-                const pid = hash.split('/')[2];
-                renderForm('Yeni Kategori', (e) => saveCategory(e, pid), [{id:'name', label:'Kategori Adı'}]);
-            } else if (hash.startsWith('#/add-item/')) {
-                const parts = hash.split('/');
-                renderForm('Yeni Kelime', (e) => saveItem(e, parts[2], parts[3]), [{id:'text', label:'Kelime'}, {id:'img', label:'Fotoğraf', type:'file'}]);
+            try {
+                if (hash === '#/') {
+                    const people = await peopleDB.getAll();
+                    renderHome(people);
+                } else if (hash === '#/quizzes') {
+                    const quizzes = await quizDB.getAll();
+                    renderQuizList(quizzes);
+                } else if (hash.startsWith('#/quiz-play/')) {
+                    const id = hash.split('/')[2];
+                    const quizzes = await quizDB.getAll();
+                    const index = quizzes.findIndex(q => q.id === id);
+                    renderQuizPlay(quizzes, index);
+                } else if (hash.startsWith('#/person/')) {
+                    const person = await peopleDB.get(hash.split('/')[2]);
+                    renderPerson(person);
+                } else if (hash.startsWith('#/category/')) {
+                    const parts = hash.split('/');
+                    const person = await peopleDB.get(parts[2]);
+                    const category = person.categories.find(c => c.id === parts[3]);
+                    renderCategory(person, category);
+                } else if (hash === '#/add-person') {
+                    renderPersonForm();
+                } else if (hash === '#/add-quiz') {
+                    renderQuizForm();
+                } else if (hash.startsWith('#/add-category/')) {
+                    renderCategoryForm(hash.split('/')[2]);
+                } else if (hash.startsWith('#/add-item/')) {
+                    const parts = hash.split('/');
+                    renderItemForm(parts[2], parts[3]);
+                }
+            } catch (err) {
+                console.error(err);
+                app.innerHTML = '<p style="padding:20px">Bir hata oluştu, lütfen sayfayı yenileyin. 🛠️</p>';
             }
         }
 
@@ -356,14 +398,139 @@
                         ${people.map(p => `
                             <div class="card person" onclick="navigate('#/person/${p.id}')">
                                 <button class="btn-delete" onclick="event.stopPropagation(); deletePerson('${p.id}')">✕</button>
-                                <div class="card-img">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:15px;object-fit:cover">` : '👤'}</div>
+                                <div class="card-img">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:20px;object-fit:cover">` : '👤'}</div>
                                 <div class="card-title">${p.name}</div>
                             </div>
                         `).join('')}
                     </div>
-                    ${people.length === 0 ? '<p style="text-align:center;margin-top:30px">Hadi birini ekleyerek başla! 🌟</p>' : ''}
+                    ${people.length === 0 ? '<div style="text-align:center;margin-top:50px"><p style="font-size:1.2rem;color:#666">Hadi birini ekleyerek başlayalım! ✨</p></div>' : ''}
                 </div>
             `;
+        }
+
+        function renderPersonForm() {
+            app.innerHTML = `
+                <div class="header">
+                    <button class="btn-round" onclick="navigate('#/')">⬅️</button>
+                    <h1>Yeni Kişi</h1>
+                    <div style="width:50px"></div>
+                </div>
+                <div class="container">
+                    <div class="form-card">
+                        <form onsubmit="handleSavePerson(event)">
+                            <div class="form-group">
+                                <label>İsim</label>
+                                <input type="text" id="pName" required placeholder="Örn: Ahmet">
+                            </div>
+                            <div class="form-group">
+                                <label>Fotoğraf (İsteğe Bağlı)</label>
+                                <input type="file" id="pImg" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn-save">Kaydet ✨</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function handleSavePerson(e) {
+            e.preventDefault();
+            const name = document.getElementById('pName').value;
+            const file = document.getElementById('pImg').files[0];
+            const person = { id: generateId(), name, avatar: null, categories: [] };
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    person.avatar = ev.target.result;
+                    await peopleDB.save(person);
+                    navigate('#/');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                await peopleDB.save(person);
+                navigate('#/');
+            }
+        }
+
+        function renderCategoryForm(pid) {
+            app.innerHTML = `
+                <div class="header">
+                    <button class="btn-round" onclick="navigate('#/person/${pid}')">⬅️</button>
+                    <h1>Yeni Kategori</h1>
+                    <div style="width:50px"></div>
+                </div>
+                <div class="container">
+                    <div class="form-card">
+                        <form onsubmit="handleSaveCategory(event, '${pid}')">
+                            <div class="form-group">
+                                <label>Kategori Adı</label>
+                                <input type="text" id="cName" required placeholder="Örn: Yemekler">
+                            </div>
+                            <button type="submit" class="btn-save">Kaydet ✨</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function handleSaveCategory(e, pid) {
+            e.preventDefault();
+            const name = document.getElementById('cName').value;
+            const person = await peopleDB.get(pid);
+            if (!person.categories) person.categories = [];
+            person.categories.push({ id: generateId(), name, items: [] });
+            await peopleDB.save(person);
+            navigate('#/person/' + pid);
+        }
+
+        function renderItemForm(pid, cid) {
+            app.innerHTML = `
+                <div class="header">
+                    <button class="btn-round" onclick="navigate('#/category/${pid}/${cid}')">⬅️</button>
+                    <h1>Yeni Kelime</h1>
+                    <div style="width:50px"></div>
+                </div>
+                <div class="container">
+                    <div class="form-card">
+                        <form onsubmit="handleSaveItem(event, '${pid}', '${cid}')">
+                            <div class="form-group">
+                                <label>Kelime</label>
+                                <input type="text" id="iText" required placeholder="Örn: Su istiyorum">
+                            </div>
+                            <div class="form-group">
+                                <label>Fotoğraf</label>
+                                <input type="file" id="iImg" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn-save">Kaydet ✨</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function handleSaveItem(e, pid, cid) {
+            e.preventDefault();
+            const text = document.getElementById('iText').value;
+            const file = document.getElementById('iImg').files[0];
+            const person = await peopleDB.get(pid);
+            const cat = person.categories.find(c => c.id === cid);
+            const item = { id: generateId(), text, image: null };
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    item.image = ev.target.result;
+                    cat.items.push(item);
+                    await peopleDB.save(person);
+                    navigate('#/category/' + pid + '/' + cid);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                cat.items.push(item);
+                await peopleDB.save(person);
+                navigate('#/category/' + pid + '/' + cid);
+            }
         }
 
         function renderQuizList(quizzes) {
@@ -383,7 +550,7 @@
                             </div>
                         `).join('')}
                     </div>
-                    ${quizzes.length === 0 ? '<p style="text-align:center;margin-top:30px">Henüz soru yok, hadi bir tane ekle! 🎮</p>' : ''}
+                    ${quizzes.length === 0 ? '<div style="text-align:center;margin-top:50px"><p>Hadi bir soru ekle! 🎮</p></div>' : ''}
                 </div>
             `;
         }
@@ -396,14 +563,14 @@
                 <div class="header">
                     <button class="btn-round" onclick="navigate('#/quizzes')">⬅️</button>
                     <h1>Soru ${index + 1}</h1>
-                    <div style="width:45px"></div>
+                    <div style="width:50px"></div>
                 </div>
                 <div class="container">
                     <div class="quiz-container">
                         <div class="quiz-question">${quiz.question}</div>
                         <div class="options-grid">
                             ${quiz.options.map((opt, i) => `
-                                <button class="option-btn" onclick="checkAnswer(this, ${i === quiz.correct}, '${quiz.id}')">${opt}</button>
+                                <button class="option-btn" onclick="checkAnswer(this, ${i === quiz.correct})">${opt}</button>
                             `).join('')}
                         </div>
                         <button class="next-btn" onclick="navigate('#/quiz-play/${quizzes[index+1]?.id || quizzes[0].id}')">Sıradaki Soru ➡️</button>
@@ -412,7 +579,7 @@
             `;
         }
 
-        window.checkAnswer = (btn, isCorrect, quizId) => {
+        window.checkAnswer = (btn, isCorrect) => {
             if (isCorrect) {
                 btn.classList.add('correct');
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
@@ -457,7 +624,7 @@
                         ${(category.items || []).map(i => `
                             <div class="card item" onclick="speak('${i.text}')">
                                 <button class="btn-delete" onclick="event.stopPropagation(); deleteItem('${person.id}', '${category.id}', '${i.id}')">✕</button>
-                                <div class="card-img">${i.image ? `<img src="${i.image}" style="width:100%;height:100%;border-radius:15px;object-fit:cover">` : '💬'}</div>
+                                <div class="card-img">${i.image ? `<img src="${i.image}" style="width:100%;height:100%;border-radius:20px;object-fit:cover">` : '💬'}</div>
                                 <div class="card-title">${i.text}</div>
                             </div>
                         `).join('')}
@@ -471,105 +638,36 @@
                 <div class="header">
                     <button class="btn-round" onclick="navigate('#/quizzes')">⬅️</button>
                     <h1>Yeni Soru</h1>
-                    <div style="width:45px"></div>
+                    <div style="width:50px"></div>
                 </div>
                 <div class="container">
-                    <form onsubmit="saveQuiz(event)" class="quiz-container">
-                        <div class="form-group">
-                            <label>Soru Nedir?</label>
-                            <input type="text" id="qText" required placeholder="Örn: Hangisi elmadır?">
-                        </div>
-                        <div class="form-group"><label>Seçenek 1</label><input type="text" id="opt0" required></div>
-                        <div class="form-group"><label>Seçenek 2</label><input type="text" id="opt1" required></div>
-                        <div class="form-group"><label>Seçenek 3</label><input type="text" id="opt2" required></div>
-                        <div class="form-group"><label>Seçenek 4</label><input type="text" id="opt3" required></div>
-                        <div class="form-group">
-                            <label>Doğru Cevap Hangisi?</label>
-                            <select id="correctIdx">
-                                <option value="0">Seçenek 1</option>
-                                <option value="1">Seçenek 2</option>
-                                <option value="2">Seçenek 3</option>
-                                <option value="3">Seçenek 4</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-save">Kaydet 🎮</button>
-                    </form>
-                </div>
-            `;
-        }
-
-        function renderForm(title, onsubmit, fields) {
-            app.innerHTML = `
-                <div class="header">
-                    <button class="btn-round" onclick="window.history.back()">⬅️</button>
-                    <h1>${title}</h1>
-                    <div style="width:45px"></div>
-                </div>
-                <div class="container">
-                    <form onsubmit="event.preventDefault(); ${onsubmit.name}(event)" style="background:white;padding:25px;border-radius:25px">
-                        ${fields.map(f => `
+                    <div class="form-card">
+                        <form onsubmit="handleSaveQuiz(event)">
                             <div class="form-group">
-                                <label>${f.label}</label>
-                                <input type="${f.type || 'text'}" id="${f.id}" ${f.type !== 'file' ? 'required' : ''}>
+                                <label>Soru</label>
+                                <input type="text" id="qText" required placeholder="Örn: Hangisi bir meyvedir?">
                             </div>
-                        `).join('')}
-                        <button type="submit" class="btn-save">Kaydet ✨</button>
-                    </form>
+                            <div class="form-group"><label>Seçenek 1</label><input type="text" id="opt0" required></div>
+                            <div class="form-group"><label>Seçenek 2</label><input type="text" id="opt1" required></div>
+                            <div class="form-group"><label>Seçenek 3</label><input type="text" id="opt2" required></div>
+                            <div class="form-group"><label>Seçenek 4</label><input type="text" id="opt3" required></div>
+                            <div class="form-group">
+                                <label>Doğru Cevap</label>
+                                <select id="correctIdx">
+                                    <option value="0">Seçenek 1</option>
+                                    <option value="1">Seçenek 2</option>
+                                    <option value="2">Seçenek 3</option>
+                                    <option value="3">Seçenek 4</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-save">Kaydet 🎮</button>
+                        </form>
+                    </div>
                 </div>
             `;
-            window[onsubmit.name] = onsubmit;
         }
 
-        // ==================== HANDLERS ====================
-        async function savePerson(e) {
-            const name = document.getElementById('name').value;
-            const file = document.getElementById('img').files[0];
-            const person = { id: generateId(), name, avatar: null, categories: [] };
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = async (ev) => {
-                    person.avatar = ev.target.result;
-                    await peopleDB.save(person);
-                    navigate('#/');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                await peopleDB.save(person);
-                navigate('#/');
-            }
-        }
-
-        async function saveCategory(e, pid) {
-            const name = document.getElementById('name').value;
-            const person = await peopleDB.get(pid);
-            person.categories.push({ id: generateId(), name, items: [] });
-            await peopleDB.save(person);
-            navigate('#/person/' + pid);
-        }
-
-        async function saveItem(e, pid, cid) {
-            const text = document.getElementById('text').value;
-            const file = document.getElementById('img').files[0];
-            const person = await peopleDB.get(pid);
-            const cat = person.categories.find(c => c.id === cid);
-            const item = { id: generateId(), text, image: null };
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = async (ev) => {
-                    item.image = ev.target.result;
-                    cat.items.push(item);
-                    await peopleDB.save(person);
-                    navigate('#/category/' + pid + '/' + cid);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                cat.items.push(item);
-                await peopleDB.save(person);
-                navigate('#/category/' + pid + '/' + cid);
-            }
-        }
-
-        async function saveQuiz(e) {
+        async function handleSaveQuiz(e) {
             e.preventDefault();
             const quiz = {
                 id: generateId(),
@@ -586,10 +684,11 @@
             navigate('#/quizzes');
         }
 
-        window.deletePerson = async (id) => { if(confirm('Silinsin mi?')) { await peopleDB.delete(id); render(); } };
-        window.deleteQuiz = async (id) => { if(confirm('Soru silinsin mi?')) { await quizDB.delete(id); render(); } };
+        // ==================== DELETE HANDLERS ====================
+        window.deletePerson = async (id) => { if(confirm('Bu kişiyi silmek istediğine emin misin?')) { await peopleDB.delete(id); render(); } };
+        window.deleteQuiz = async (id) => { if(confirm('Bu soruyu silmek istediğine emin misin?')) { await quizDB.delete(id); render(); } };
         window.deleteCategory = async (pid, cid) => {
-            if(confirm('Kategori silinsin mi?')) {
+            if(confirm('Kategoriyi silmek istediğine emin misin?')) {
                 const p = await peopleDB.get(pid);
                 p.categories = p.categories.filter(c => c.id !== cid);
                 await peopleDB.save(p);
@@ -597,7 +696,7 @@
             }
         };
         window.deleteItem = async (pid, cid, iid) => {
-            if(confirm('Kelime silinsin mi?')) {
+            if(confirm('Bu kelimeyi silmek istediğine emin misin?')) {
                 const p = await peopleDB.get(pid);
                 const c = p.categories.find(cat => cat.id === cid);
                 c.items = c.items.filter(i => i.id !== iid);
