@@ -7,7 +7,7 @@
     <title>Konuşuyorum & Öğreniyorum 🌈</title>
 
     <link rel="manifest" href="manifest.json">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@600;700;800&family=Indie+Flower&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style id="theme-styles">
@@ -22,45 +22,50 @@
         body.theme-modern { background-color: var(--bg); color: var(--text); }
         body.theme-classic { background-color: #fdf2f8; color: #831843; }
         body.theme-space { background-color: #0f172a; color: #f8fafc; }
+        body.theme-notebook { background-color: #fefce8; color: #1e293b; background-image: linear-gradient(#e5e7eb 1px, transparent 1px); background-size: 100% 30px; }
 
-        /* ARKA PLAN ANİMASYONLARI KONTEYNERI */
+        /* ARKA PLAN ANİMASYONLARI */
         .bg-animations { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
-        
-        /* ORTAK ANİMASYON ÖĞELERİ */
-        .anim-item { position: absolute; opacity: 0.6; }
+        .anim-item { position: absolute; }
 
-        /* UZAY TEMASI ÖZEL */
-        .theme-space .rocket { font-size: 4rem; animation: roam 25s infinite ease-in-out; }
-        .theme-space .planet { font-size: 7rem; animation: slowSpin 40s infinite linear; opacity: 0.4; }
+        /* UZAY - GERÇEKÇİ */
+        .theme-space .rocket { font-size: 4.5rem; animation: roam 30s infinite ease-in-out; }
+        .theme-space .planet { font-size: 8rem; animation: slowSpin 50s infinite linear; opacity: 0.4; }
         .theme-space .star { background: white; border-radius: 50%; animation: twinkle 3s infinite; }
-        .theme-space .shooting-star { width: 150px; height: 2px; background: linear-gradient(90deg, white, transparent); animation: shootSlow 8s infinite linear; opacity: 0; }
-
-        /* GÖKKUŞAĞI TEMASI ÖZEL */
-        .theme-modern .cloud { font-size: 5rem; opacity: 0.3; animation: floatHorizontal 30s infinite linear; }
-        .theme-modern .balloon { font-size: 3.5rem; opacity: 0.4; animation: roam 20s infinite ease-in-out; }
-        .theme-modern .sun { font-size: 8rem; top: 5%; right: 5%; opacity: 0.2; animation: slowSpin 60s infinite linear; }
-
-        /* KLASİK TEMA ÖZEL */
-        .theme-classic .heart { font-size: 3rem; opacity: 0.2; animation: floatUp 15s infinite linear; }
-        .theme-classic .flower { font-size: 4rem; opacity: 0.2; animation: slowSpin 35s infinite linear; }
-
-        /* ANİMASYON TANIMLARI */
-        @keyframes roam {
-            0% { transform: translate(-10vw, 110vh) rotate(0deg); }
-            25% { transform: translate(30vw, 50vh) rotate(20deg); }
-            50% { transform: translate(80vw, 20vh) rotate(-10deg); }
-            75% { transform: translate(110vw, 60vh) rotate(30deg); }
-            100% { transform: translate(-10vw, 110vh) rotate(0deg); }
+        .theme-space .shooting-star { 
+            width: 200px; height: 1px; 
+            background: linear-gradient(90deg, rgba(255,255,255,0.8), transparent); 
+            animation: shootRealistic 12s infinite linear; opacity: 0;
         }
-        @keyframes slowSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; } }
-        @keyframes shootSlow {
-            0% { transform: translate(-100px, -100px) rotate(-45deg); opacity: 1; }
-            15% { transform: translate(120vw, 120vh) rotate(-45deg); opacity: 0; }
+        @keyframes shootRealistic {
+            0% { transform: translate(-100px, -100px) rotate(-35deg); opacity: 0; }
+            5% { opacity: 1; }
+            15% { transform: translate(120vw, 80vh) rotate(-35deg); opacity: 0; }
             100% { opacity: 0; }
         }
-        @keyframes floatHorizontal { from { left: -20%; } to { left: 120%; } }
-        @keyframes floatUp { from { bottom: -10%; } to { bottom: 110%; } }
+
+        /* GÖKKUŞAĞI - YAVAŞ BALONLAR */
+        .theme-modern .cloud { font-size: 5rem; opacity: 0.3; animation: floatHorizontal 40s infinite linear; }
+        .theme-modern .balloon { font-size: 3.5rem; opacity: 0.5; animation: roam 35s infinite ease-in-out; }
+        .theme-modern .sun { font-size: 9rem; top: 5%; right: 5%; opacity: 0.2; animation: slowSpin 80s infinite linear; }
+
+        /* NOT DEFTERİ - ÇİZİMLER */
+        .theme-notebook * { font-family: 'Indie Flower', cursive !important; }
+        .theme-notebook .pencil { font-size: 4rem; opacity: 0.2; animation: roam 25s infinite ease-in-out; }
+        .theme-notebook .paperclip { font-size: 3rem; opacity: 0.2; animation: slowSpin 40s infinite linear; }
+        .theme-notebook .card { border: 2px solid #94a3b8; border-radius: 5px; box-shadow: 5px 5px 0 #cbd5e1; }
+        .theme-notebook .header { background: #334155; border-bottom: 4px solid #1e293b; }
+
+        /* GENEL ANİMASYONLAR */
+        @keyframes roam {
+            0% { transform: translate(-15vw, 115vh) rotate(0deg); }
+            33% { transform: translate(40vw, 40vh) rotate(15deg); }
+            66% { transform: translate(85vw, 15vh) rotate(-15deg); }
+            100% { transform: translate(115vw, 60vh) rotate(10deg); }
+        }
+        @keyframes slowSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+        @keyframes floatHorizontal { from { left: -25%; } to { left: 125%; } }
 
         /* GENEL STİLLER */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Fredoka', sans-serif; }
@@ -72,8 +77,6 @@
         .container { padding: 15px; max-width: 900px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
         .card { background: white; padding: 15px 10px; text-align: center; cursor: pointer; position: relative; transition: transform 0.2s; border-radius: 20px; border: 4px solid #F0F2F5; }
-        .theme-space .card { background: #1e293b; border-color: #38bdf8; }
-        .theme-classic .card { border-color: #fbcfe8; }
         .card:active { transform: scale(0.95); }
         .card-img { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 15px; background: #F8F9FA; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; object-fit: cover; }
         .card-title { font-weight: 800; font-size: 1rem; font-family: 'Baloo 2', cursive; }
@@ -86,16 +89,12 @@
         .theme-option:hover { background: #f0f0f0; }
 
         .quiz-container { background: white; border-radius: 30px; padding: 20px; text-align: center; border: 6px solid #FFB300; }
-        .theme-space .quiz-container { background: #1e293b; border-color: #38bdf8; }
         .quiz-question { font-family: 'Baloo 2', cursive; font-size: 1.6rem; margin-bottom: 15px; font-weight: 800; }
         .quiz-img { width: 100%; max-width: 240px; height: 160px; border-radius: 20px; object-fit: cover; margin-bottom: 15px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .option-btn { background: #F8F9FA; border: 3px solid #EEE; padding: 10px; border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 4px 0 #DDD; }
-        .theme-space .option-btn { background: #334155; border-color: #475569; color: white; }
-        .option-text { font-size: 1.1rem; font-weight: 800; }
         .next-btn { background: #54A0FF; color: white; border: none; padding: 12px 30px; border-radius: 15px; font-size: 1.1rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 #2E86DE; }
         .form-card { background: white; padding: 20px; border-radius: 25px; border: 5px solid #54A0FF; }
-        .theme-space .form-card { background: #1e293b; border-color: #38bdf8; }
         .btn-save { width: 100%; padding: 12px; border-radius: 15px; border: none; background: #1DD1A1; color: white; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 0 #10AC84; }
 
         @media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } .options-grid { grid-template-columns: 1fr; } }
@@ -108,6 +107,7 @@
         <div class="theme-option" onclick="setTheme('modern')">🌈 Gökkuşağı</div>
         <div class="theme-option" onclick="setTheme('classic')">🌸 Klasik</div>
         <div class="theme-option" onclick="setTheme('space')">🚀 Uzay</div>
+        <div class="theme-option" onclick="setTheme('notebook')">📝 Not Defteri</div>
     </div>
     <div id="app"></div>
 
@@ -138,18 +138,22 @@
             container.innerHTML = '';
             
             if (currentTheme === 'space') {
-                for(let i=0; i<20; i++) container.innerHTML += `<div class="star anim-item" style="top:${Math.random()*100}%;left:${Math.random()*100}%;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;animation-delay:${Math.random()*3}s"></div>`;
-                for(let i=0; i<5; i++) container.innerHTML += `<div class="shooting-star anim-item" style="top:${Math.random()*50}%;left:${Math.random()*50}%;animation-delay:${i*2}s"></div>`;
+                for(let i=0; i<30; i++) container.innerHTML += `<div class="star anim-item" style="top:${Math.random()*100}%;left:${Math.random()*100}%;width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;animation-delay:${Math.random()*3}s"></div>`;
+                for(let i=0; i<8; i++) container.innerHTML += `<div class="shooting-star anim-item" style="top:${Math.random()*60}%;left:${Math.random()*40}%;animation-delay:${i*4}s"></div>`;
                 container.innerHTML += `<div class="rocket anim-item">🚀</div>`;
-                container.innerHTML += `<div class="planet anim-item" style="top:10%;right:10%">🌍</div>`;
-                container.innerHTML += `<div class="planet anim-item" style="bottom:15%;left:5%;animation-duration:50s">🪐</div>`;
+                container.innerHTML += `<div class="planet anim-item" style="top:15%;right:15%">🌍</div>`;
+                container.innerHTML += `<div class="planet anim-item" style="bottom:20%;left:10%;animation-duration:60s">🪐</div>`;
             } else if (currentTheme === 'modern') {
                 container.innerHTML += `<div class="sun anim-item">☀️</div>`;
-                for(let i=0; i<4; i++) container.innerHTML += `<div class="cloud anim-item" style="top:${10+i*20}%;animation-delay:${i*5}s;animation-duration:${25+Math.random()*20}s">☁️</div>`;
-                for(let i=0; i<3; i++) container.innerHTML += `<div class="balloon anim-item" style="animation-delay:${i*7}s">🎈</div>`;
+                for(let i=0; i<5; i++) container.innerHTML += `<div class="cloud anim-item" style="top:${10+i*18}%;animation-delay:${i*6}s;animation-duration:${35+Math.random()*25}s">☁️</div>`;
+                for(let i=0; i<10; i++) container.innerHTML += `<div class="balloon anim-item" style="animation-delay:${i*4}s;left:${Math.random()*90}%">🎈</div>`;
             } else if (currentTheme === 'classic') {
-                for(let i=0; i<8; i++) container.innerHTML += `<div class="heart anim-item" style="left:${Math.random()*90}%;animation-delay:${i*2}s">❤️</div>`;
-                for(let i=0; i<4; i++) container.innerHTML += `<div class="flower anim-item" style="top:${Math.random()*80}%;left:${Math.random()*80}%;animation-delay:${i*4}s">🌸</div>`;
+                for(let i=0; i<12; i++) container.innerHTML += `<div class="heart anim-item" style="left:${Math.random()*90}%;animation-delay:${i*2}s;font-size:${2+Math.random()*2}rem">❤️</div>`;
+                for(let i=0; i<6; i++) container.innerHTML += `<div class="flower anim-item" style="top:${Math.random()*80}%;left:${Math.random()*80}%;animation-delay:${i*3}s">🌸</div>`;
+            } else if (currentTheme === 'notebook') {
+                container.innerHTML += `<div class="pencil anim-item">✏️</div>`;
+                container.innerHTML += `<div class="paperclip anim-item" style="top:20%;right:10%">📎</div>`;
+                container.innerHTML += `<div class="paperclip anim-item" style="bottom:10%;left:20%;animation-delay:2s">📌</div>`;
             }
         }
 
@@ -205,7 +209,7 @@
 
         async function render() {
             const hash = window.location.hash || '#/';
-            app.innerHTML = '<div style="text-align:center;padding:100px;font-size:3rem">🌈</div>';
+            app.innerHTML = '<div style="text-align:center;padding:100px;font-size:3rem">✨</div>';
 
             try {
                 if (hash === '#/') {
@@ -257,10 +261,10 @@
         }
 
         function getHeader(title, backHash = null, extraBtn = null) {
-            const themeIcons = { modern: '🌈', classic: '🌸', space: '🚀' };
-            const headerColor = currentTheme === 'space' ? '#1e293b' : (currentTheme === 'classic' ? '#ec4899' : '#FFB300');
+            const themeIcons = { modern: '🌈', classic: '🌸', space: '🚀', notebook: '📝' };
+            const colors = { modern: '#FFB300', classic: '#ec4899', space: '#1e293b', notebook: '#334155' };
             return `
-                <div class="header" style="background:${headerColor}">
+                <div class="header" style="background:${colors[currentTheme]}">
                     ${backHash ? `<button class="btn-round" onclick="navigate('${backHash}')">⬅️</button>` : `<button class="btn-round" onclick="toggleThemeMenu()">${themeIcons[currentTheme]}</button>`}
                     <h1>${title}</h1>
                     <div class="nav-buttons">${extraBtn || ''}</div>
