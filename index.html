@@ -12,63 +12,58 @@
 
     <style id="theme-styles">
         :root {
-            --primary: #FFB300;
-            --secondary: #00D2D3;
-            --accent: #FF6B6B;
-            --blue: #54A0FF;
-            --green: #1DD1A1;
-            --bg: #FFF9E6;
-            --text: #4834D4;
-            --white: #FFFFFF;
+            --primary: #FFB300; --secondary: #00D2D3; --accent: #FF6B6B;
+            --blue: #54A0FF; --green: #1DD1A1; --bg: #FFF9E6;
+            --text: #4834D4; --white: #FFFFFF;
         }
 
-        /* MODERN TEMA */
-        body.theme-modern { background-color: var(--bg); background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png"); color: var(--text); }
-        .theme-modern .header { background: var(--primary); border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
-        .theme-modern .card { border-radius: 30px; border: 5px solid #F0F2F5; }
-
-        /* KLASİK TEMA */
-        body.theme-classic { background-color: #fdf2f8; color: #831843; }
-        .theme-classic .header { background: #ec4899; }
-        .theme-classic .card { border-radius: 15px; border: 2px solid #fbcfe8; }
-        .theme-classic .btn-round { border-radius: 12px; background: #fdf2f8; color: #ec4899; }
-
-        /* UZAY TEMASI */
-        body.theme-space { background-color: #0f172a; color: #f8fafc; overflow-x: hidden; }
-        .theme-space .header { background: #1e293b; border-bottom: 3px solid #38bdf8; }
-        .theme-space .card { background: #1e293b; border: 3px solid #38bdf8; color: #f8fafc; }
-        .theme-space .card-title { color: #38bdf8; }
-        .theme-space .btn-round { background: #334155; color: #38bdf8; }
-        .theme-space .quiz-container { background: #1e293b; border-color: #38bdf8; }
-        .theme-space .option-btn { background: #334155; border-color: #475569; color: white; }
-        .theme-space .form-card { background: #1e293b; border-color: #38bdf8; color: white; }
-        .theme-space input, .theme-space select { background: #334155; color: white; border-color: #475569; }
-
-        /* UZAY ANİMASYONLARI */
-        .space-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        body.theme-space .space-bg { display: block; }
-        
-        .rocket { position: absolute; font-size: 3rem; animation: flyRocket 15s infinite linear; }
-        @keyframes flyRocket { 
-            0% { bottom: -10%; left: -10%; transform: rotate(45deg); }
-            100% { bottom: 110%; left: 110%; transform: rotate(45deg); }
-        }
-
-        .planet { position: absolute; font-size: 4rem; animation: spinPlanet 20s infinite linear; opacity: 0.6; }
-        @keyframes spinPlanet { 
-            0% { transform: rotate(0deg) translate(50px) rotate(0deg); }
-            100% { transform: rotate(360deg) translate(50px) rotate(-360deg); }
-        }
-
-        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle 2s infinite ease-in-out; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
-
-        .shooting-star { position: absolute; width: 100px; height: 2px; background: linear-gradient(90deg, white, transparent); animation: shoot 4s infinite linear; opacity: 0; }
-        @keyframes shoot { 0% { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 1; } 10% { transform: translateX(500px) translateY(500px) rotate(-45deg); opacity: 0; } 100% { opacity: 0; } }
-
-        /* ORTAK STİLLER */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Fredoka', sans-serif; }
+        /* TEMA TEMELLERİ */
         body { min-height: 100vh; overflow-x: hidden; user-select: none; transition: all 0.3s; }
+        body.theme-modern { background-color: var(--bg); color: var(--text); }
+        body.theme-classic { background-color: #fdf2f8; color: #831843; }
+        body.theme-space { background-color: #0f172a; color: #f8fafc; }
+
+        /* ARKA PLAN ANİMASYONLARI KONTEYNERI */
+        .bg-animations { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
+        
+        /* ORTAK ANİMASYON ÖĞELERİ */
+        .anim-item { position: absolute; opacity: 0.6; }
+
+        /* UZAY TEMASI ÖZEL */
+        .theme-space .rocket { font-size: 4rem; animation: roam 25s infinite ease-in-out; }
+        .theme-space .planet { font-size: 7rem; animation: slowSpin 40s infinite linear; opacity: 0.4; }
+        .theme-space .star { background: white; border-radius: 50%; animation: twinkle 3s infinite; }
+        .theme-space .shooting-star { width: 150px; height: 2px; background: linear-gradient(90deg, white, transparent); animation: shootSlow 8s infinite linear; opacity: 0; }
+
+        /* GÖKKUŞAĞI TEMASI ÖZEL */
+        .theme-modern .cloud { font-size: 5rem; opacity: 0.3; animation: floatHorizontal 30s infinite linear; }
+        .theme-modern .balloon { font-size: 3.5rem; opacity: 0.4; animation: roam 20s infinite ease-in-out; }
+        .theme-modern .sun { font-size: 8rem; top: 5%; right: 5%; opacity: 0.2; animation: slowSpin 60s infinite linear; }
+
+        /* KLASİK TEMA ÖZEL */
+        .theme-classic .heart { font-size: 3rem; opacity: 0.2; animation: floatUp 15s infinite linear; }
+        .theme-classic .flower { font-size: 4rem; opacity: 0.2; animation: slowSpin 35s infinite linear; }
+
+        /* ANİMASYON TANIMLARI */
+        @keyframes roam {
+            0% { transform: translate(-10vw, 110vh) rotate(0deg); }
+            25% { transform: translate(30vw, 50vh) rotate(20deg); }
+            50% { transform: translate(80vw, 20vh) rotate(-10deg); }
+            75% { transform: translate(110vw, 60vh) rotate(30deg); }
+            100% { transform: translate(-10vw, 110vh) rotate(0deg); }
+        }
+        @keyframes slowSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.8; } }
+        @keyframes shootSlow {
+            0% { transform: translate(-100px, -100px) rotate(-45deg); opacity: 1; }
+            15% { transform: translate(120vw, 120vh) rotate(-45deg); opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes floatHorizontal { from { left: -20%; } to { left: 120%; } }
+        @keyframes floatUp { from { bottom: -10%; } to { bottom: 110%; } }
+
+        /* GENEL STİLLER */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Fredoka', sans-serif; }
         .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .header h1 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: white; font-weight: 800; }
         .nav-buttons { display: flex; gap: 8px; }
@@ -76,49 +71,38 @@
         .btn-round:active { transform: translateY(3px); box-shadow: none; }
         .container { padding: 15px; max-width: 900px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .card { background: white; padding: 15px 10px; text-align: center; cursor: pointer; position: relative; transition: transform 0.2s; }
+        .card { background: white; padding: 15px 10px; text-align: center; cursor: pointer; position: relative; transition: transform 0.2s; border-radius: 20px; border: 4px solid #F0F2F5; }
+        .theme-space .card { background: #1e293b; border-color: #38bdf8; }
+        .theme-classic .card { border-color: #fbcfe8; }
         .card:active { transform: scale(0.95); }
-        .card-img { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 18px; background: #F8F9FA; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; object-fit: cover; }
+        .card-img { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 15px; background: #F8F9FA; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; object-fit: cover; }
         .card-title { font-weight: 800; font-size: 1rem; font-family: 'Baloo 2', cursive; }
         .action-btns { position: absolute; top: 5px; right: 5px; display: flex; flex-direction: column; gap: 3px; }
         .btn-mini { width: 24px; height: 24px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; }
         .btn-del { background: #FF6B6B; } .btn-edit { background: #54A0FF; }
 
-        /* TEMA SEÇİCİ */
-        .theme-selector { position: absolute; top: 60px; left: 15px; background: white; border-radius: 15px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; z-index: 200; border: 3px solid var(--primary); }
+        .theme-selector { position: absolute; top: 60px; left: 15px; background: white; border-radius: 15px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; z-index: 200; border: 3px solid #FFB300; }
         .theme-option { padding: 10px 15px; cursor: pointer; font-weight: 800; border-radius: 10px; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; color: #4834D4; }
         .theme-option:hover { background: #f0f0f0; }
 
-        .quiz-container { background: white; border-radius: 30px; padding: 20px; text-align: center; border: 6px solid var(--primary); }
+        .quiz-container { background: white; border-radius: 30px; padding: 20px; text-align: center; border: 6px solid #FFB300; }
+        .theme-space .quiz-container { background: #1e293b; border-color: #38bdf8; }
         .quiz-question { font-family: 'Baloo 2', cursive; font-size: 1.6rem; margin-bottom: 15px; font-weight: 800; }
         .quiz-img { width: 100%; max-width: 240px; height: 160px; border-radius: 20px; object-fit: cover; margin-bottom: 15px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .option-btn { background: #F8F9FA; border: 3px solid #EEE; padding: 10px; border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 4px 0 #DDD; }
-        .option-img { width: 100%; height: 80px; border-radius: 10px; object-fit: cover; }
+        .theme-space .option-btn { background: #334155; border-color: #475569; color: white; }
         .option-text { font-size: 1.1rem; font-weight: 800; }
-        .option-btn.correct { border-color: #1DD1A1; background: #E6FFFA; box-shadow: 0 4px 0 #1DD1A1; }
-        .option-btn.wrong { border-color: #FF6B6B; background: #FFF5F5; box-shadow: 0 4px 0 #FF6B6B; }
         .next-btn { background: #54A0FF; color: white; border: none; padding: 12px 30px; border-radius: 15px; font-size: 1.1rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 #2E86DE; }
         .form-card { background: white; padding: 20px; border-radius: 25px; border: 5px solid #54A0FF; }
+        .theme-space .form-card { background: #1e293b; border-color: #38bdf8; }
         .btn-save { width: 100%; padding: 12px; border-radius: 15px; border: none; background: #1DD1A1; color: white; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 0 #10AC84; }
 
         @media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } .options-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body class="theme-modern">
-    <!-- UZAY ARKA PLANI -->
-    <div class="space-bg" id="space-elements">
-        <div class="star" style="top:10%;left:20%;width:3px;height:3px"></div>
-        <div class="star" style="top:30%;left:80%;width:2px;height:2px;animation-delay:1s"></div>
-        <div class="star" style="top:70%;left:10%;width:4px;height:4px;animation-delay:0.5s"></div>
-        <div class="star" style="top:50%;left:50%;width:2px;height:2px;animation-delay:1.5s"></div>
-        <div class="star" style="top:85%;left:90%;width:3px;height:3px"></div>
-        <div class="rocket">🚀</div>
-        <div class="planet" style="top:15%;right:15%">🌍</div>
-        <div class="planet" style="bottom:20%;left:10%;animation-duration:25s">🪐</div>
-        <div class="shooting-star" style="top:20%;left:10%"></div>
-        <div class="shooting-star" style="top:50%;left:60%;animation-delay:2s"></div>
-    </div>
+    <div class="bg-animations" id="bg-elements"></div>
 
     <div id="theme-menu" class="theme-selector">
         <div class="theme-option" onclick="setTheme('modern')">🌈 Gökkuşağı</div>
@@ -145,7 +129,28 @@
             document.body.className = 'theme-' + theme;
             localStorage.setItem('app-theme', theme);
             document.getElementById('theme-menu').style.display = 'none';
+            updateBackground();
             render();
+        }
+
+        function updateBackground() {
+            const container = document.getElementById('bg-elements');
+            container.innerHTML = '';
+            
+            if (currentTheme === 'space') {
+                for(let i=0; i<20; i++) container.innerHTML += `<div class="star anim-item" style="top:${Math.random()*100}%;left:${Math.random()*100}%;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;animation-delay:${Math.random()*3}s"></div>`;
+                for(let i=0; i<5; i++) container.innerHTML += `<div class="shooting-star anim-item" style="top:${Math.random()*50}%;left:${Math.random()*50}%;animation-delay:${i*2}s"></div>`;
+                container.innerHTML += `<div class="rocket anim-item">🚀</div>`;
+                container.innerHTML += `<div class="planet anim-item" style="top:10%;right:10%">🌍</div>`;
+                container.innerHTML += `<div class="planet anim-item" style="bottom:15%;left:5%;animation-duration:50s">🪐</div>`;
+            } else if (currentTheme === 'modern') {
+                container.innerHTML += `<div class="sun anim-item">☀️</div>`;
+                for(let i=0; i<4; i++) container.innerHTML += `<div class="cloud anim-item" style="top:${10+i*20}%;animation-delay:${i*5}s;animation-duration:${25+Math.random()*20}s">☁️</div>`;
+                for(let i=0; i<3; i++) container.innerHTML += `<div class="balloon anim-item" style="animation-delay:${i*7}s">🎈</div>`;
+            } else if (currentTheme === 'classic') {
+                for(let i=0; i<8; i++) container.innerHTML += `<div class="heart anim-item" style="left:${Math.random()*90}%;animation-delay:${i*2}s">❤️</div>`;
+                for(let i=0; i<4; i++) container.innerHTML += `<div class="flower anim-item" style="top:${Math.random()*80}%;left:${Math.random()*80}%;animation-delay:${i*4}s">🌸</div>`;
+            }
         }
 
         function initDB() {
@@ -200,7 +205,7 @@
 
         async function render() {
             const hash = window.location.hash || '#/';
-            app.innerHTML = '<div style="text-align:center;padding:100px;font-size:3rem">🚀</div>';
+            app.innerHTML = '<div style="text-align:center;padding:100px;font-size:3rem">🌈</div>';
 
             try {
                 if (hash === '#/') {
@@ -253,8 +258,9 @@
 
         function getHeader(title, backHash = null, extraBtn = null) {
             const themeIcons = { modern: '🌈', classic: '🌸', space: '🚀' };
+            const headerColor = currentTheme === 'space' ? '#1e293b' : (currentTheme === 'classic' ? '#ec4899' : '#FFB300');
             return `
-                <div class="header">
+                <div class="header" style="background:${headerColor}">
                     ${backHash ? `<button class="btn-round" onclick="navigate('${backHash}')">⬅️</button>` : `<button class="btn-round" onclick="toggleThemeMenu()">${themeIcons[currentTheme]}</button>`}
                     <h1>${title}</h1>
                     <div class="nav-buttons">${extraBtn || ''}</div>
@@ -270,7 +276,7 @@
                             <button class="btn-mini btn-del" onclick="event.stopPropagation(); deletePerson('${p.id}')">✕</button>
                             <button class="btn-mini btn-edit" onclick="event.stopPropagation(); navigate('#/edit-person/${p.id}')">✎</button>
                         </div>
-                        <div class="card-img">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:15px;object-fit:cover">` : '👤'}</div>
+                        <div class="card-img">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:12px;object-fit:cover">` : '👤'}</div>
                         <div class="card-title">${p.name}</div>
                     </div>`).join('')}</div></div>`;
         }
@@ -336,7 +342,7 @@
                             <button class="btn-mini btn-del" onclick="event.stopPropagation(); deleteItem('${person.id}', '${category.id}', '${i.id}')">✕</button>
                             <button class="btn-mini btn-edit" onclick="event.stopPropagation(); navigate('#/edit-item/${person.id}/${category.id}/${i.id}')">✎</button>
                         </div>
-                        <div class="card-img">${i.image ? `<img src="${i.image}" style="width:100%;height:100%;border-radius:15px;object-fit:cover">` : '💬'}</div>
+                        <div class="card-img">${i.image ? `<img src="${i.image}" style="width:100%;height:100%;border-radius:12px;object-fit:cover">` : '💬'}</div>
                         <div class="card-title">${i.text}</div>
                     </div>`).join('')}</div></div>`;
         }
@@ -369,7 +375,7 @@
                 <div class="container"><div class="grid">${(person.quizzes || []).map(q => `
                     <div class="card quiz" onclick="navigate('#/quiz-play/${person.id}/${q.id}')">
                         <button class="btn-mini btn-del" style="position:absolute;top:5px;right:5px" onclick="event.stopPropagation(); deleteQuiz('${person.id}', '${q.id}')">✕</button>
-                        <div class="card-img">${q.image ? `<img src="${q.image}" style="width:100%;height:100%;border-radius:15px;object-fit:cover">` : '❓'}</div>
+                        <div class="card-img">${q.image ? `<img src="${q.image}" style="width:100%;height:100%;border-radius:12px;object-fit:cover">` : '❓'}</div>
                         <div class="card-title">${q.question}</div>
                     </div>`).join('')}</div></div>`;
         }
@@ -429,7 +435,7 @@
         window.deleteItem = async (pid, cid, iid) => { if(confirm('Silinsin mi?')) { const p = await peopleDB.get(pid); const c = p.categories.find(cat => cat.id === cid); c.items = c.items.filter(i => i.id !== iid); await peopleDB.save(p); render(); } };
 
         window.addEventListener('hashchange', render);
-        window.addEventListener('load', async () => { await initDB(); render(); });
+        window.addEventListener('load', async () => { await initDB(); updateBackground(); render(); });
     </script>
 </body>
 </html>
