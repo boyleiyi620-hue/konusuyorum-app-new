@@ -23,111 +23,94 @@
         }
 
         /* MODERN TEMA (UNISEX & ANIMATED) */
-        body.theme-modern {
-            background-color: var(--bg);
-            background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png");
-            color: var(--text);
-        }
-        .theme-modern .card {
-            border-radius: 30px;
-            box-shadow: 0 8px 0 rgba(0,0,0,0.05);
-            border: 5px solid #F0F2F5;
-        }
-        .theme-modern .header {
-            background: var(--primary);
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
-        }
+        body.theme-modern { background-color: var(--bg); background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png"); color: var(--text); }
+        .theme-modern .header { background: var(--primary); border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
+        .theme-modern .card { border-radius: 30px; border: 5px solid #F0F2F5; }
 
-        /* KLASİK TEMA (İLK ATILAN TEMANIN GELİŞMİŞ HALİ) */
-        body.theme-classic {
-            background-color: #fdf2f8;
-            background-image: none;
-            color: #831843;
-        }
-        .theme-classic .header {
-            background: #ec4899;
-            border-radius: 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .theme-classic .card {
-            border-radius: 15px;
-            border: 2px solid #fbcfe8;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .theme-classic .btn-round {
-            border-radius: 12px;
-            background: #fdf2f8;
-            color: #ec4899;
-        }
-        .theme-classic .btn-save {
-            background: #ec4899;
-            box-shadow: 0 4px 0 #be185d;
-        }
+        /* KLASİK TEMA (SAMİMİ & PEMBE) */
+        body.theme-classic { background-color: #fdf2f8; color: #831843; }
+        .theme-classic .header { background: #ec4899; }
+        .theme-classic .card { border-radius: 15px; border: 2px solid #fbcfe8; }
+        .theme-classic .btn-round { border-radius: 12px; background: #fdf2f8; color: #ec4899; }
+
+        /* UZAY TEMASI (MACERA & KOYU MAVİ) */
+        body.theme-space { background-color: #0f172a; color: #f8fafc; background-image: url("https://www.transparenttextures.com/patterns/stardust.png"); }
+        .theme-space .header { background: #1e293b; border-bottom: 3px solid #38bdf8; }
+        .theme-space .card { background: #1e293b; border: 3px solid #38bdf8; color: #f8fafc; }
+        .theme-space .card-title { color: #38bdf8; }
+        .theme-space .btn-round { background: #334155; color: #38bdf8; }
+        .theme-space .quiz-container { background: #1e293b; border-color: #38bdf8; color: white; }
+        .theme-space .option-btn { background: #334155; border-color: #475569; color: white; }
+        .theme-space .form-card { background: #1e293b; border-color: #38bdf8; color: white; }
+        .theme-space label { color: #38bdf8; }
+        .theme-space input, .theme-space select { background: #334155; color: white; border-color: #475569; }
 
         /* ORTAK STİLLER */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Fredoka', sans-serif; }
-        body { min-height: 100vh; overflow-x: hidden; user-select: none; transition: background-color 0.3s; }
-        
-        .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 6px 0 rgba(0,0,0,0.1); }
-        .header h1 { font-family: 'Baloo 2', cursive; font-size: 1.5rem; color: white; text-shadow: 1px 1px 0 rgba(0,0,0,0.1); font-weight: 800; }
-        
+        body { min-height: 100vh; overflow-x: hidden; user-select: none; transition: all 0.3s; }
+        .header { padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header h1 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: white; font-weight: 800; }
         .nav-buttons { display: flex; gap: 8px; }
-        .btn-round { border: none; width: 42px; height: 42px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+        .btn-round { border: none; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 0 rgba(0,0,0,0.1); }
         .btn-round:active { transform: translateY(3px); box-shadow: none; }
-        
-        .container { padding: 20px; max-width: 900px; margin: 0 auto; }
+        .container { padding: 15px; max-width: 900px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-
-        .card { background: var(--white); padding: 15px 10px; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; }
-        .card:active { transform: translateY(4px); }
-        .card-img { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 20px; background: #F8F9FA; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; object-fit: cover; border: 2px solid #EEE; }
+        .card { background: white; padding: 15px 10px; text-align: center; cursor: pointer; position: relative; transition: transform 0.2s; }
+        .card:active { transform: scale(0.95); }
+        .card-img { width: 80px; height: 80px; margin: 0 auto 10px; border-radius: 18px; background: #F8F9FA; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; object-fit: cover; }
         .card-title { font-weight: 800; font-size: 1rem; font-family: 'Baloo 2', cursive; }
-
         .action-btns { position: absolute; top: 5px; right: 5px; display: flex; flex-direction: column; gap: 3px; }
-        .btn-mini { width: 26px; height: 26px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 0 rgba(0,0,0,0.1); font-size: 0.7rem; color: white; }
-        .btn-del { background: #FF6B6B; }
-        .btn-edit { background: #54A0FF; }
+        .btn-mini { width: 24px; height: 24px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; }
+        .btn-del { background: #FF6B6B; } .btn-edit { background: #54A0FF; }
+
+        /* TEMA SEÇİCİ */
+        .theme-selector { position: absolute; top: 60px; left: 15px; background: white; border-radius: 15px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: none; z-index: 200; border: 3px solid var(--primary); }
+        .theme-option { padding: 10px 15px; cursor: pointer; font-weight: 800; border-radius: 10px; margin-bottom: 5px; transition: background 0.2s; display: flex; align-items: center; gap: 10px; color: #4834D4; }
+        .theme-option:hover { background: #f0f0f0; }
+        .theme-option.active { background: var(--primary); color: white; }
 
         .quiz-container { background: white; border-radius: 30px; padding: 20px; text-align: center; border: 6px solid var(--primary); }
         .quiz-question { font-family: 'Baloo 2', cursive; font-size: 1.6rem; margin-bottom: 15px; font-weight: 800; }
-        .quiz-img { width: 100%; max-width: 240px; height: 160px; border-radius: 20px; object-fit: cover; margin-bottom: 15px; border: 3px solid #F0F2F5; }
-        
+        .quiz-img { width: 100%; max-width: 240px; height: 160px; border-radius: 20px; object-fit: cover; margin-bottom: 15px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .option-btn { background: #F8F9FA; border: 3px solid #EEE; padding: 12px; border-radius: 15px; cursor: pointer; transition: all 0.2s; font-family: 'Baloo 2', cursive; box-shadow: 0 4px 0 #DDD; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .option-btn { background: #F8F9FA; border: 3px solid #EEE; padding: 10px; border-radius: 15px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 4px 0 #DDD; }
         .option-img { width: 100%; height: 80px; border-radius: 10px; object-fit: cover; }
         .option-text { font-size: 1.1rem; font-weight: 800; }
         .option-btn.correct { border-color: #1DD1A1; background: #E6FFFA; box-shadow: 0 4px 0 #1DD1A1; }
-        .option-btn.wrong { border-color: #FF6B6B; background: #FFF5F5; box-shadow: 0 4px 0 #FF6B6B; animation: shake 0.4s; }
-
-        .next-btn { background: #54A0FF; color: white; border: none; padding: 12px 30px; border-radius: 15px; font-size: 1.1rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 #2E86DE; font-family: 'Baloo 2', cursive; }
-
+        .option-btn.wrong { border-color: #FF6B6B; background: #FFF5F5; box-shadow: 0 4px 0 #FF6B6B; }
+        .next-btn { background: #54A0FF; color: white; border: none; padding: 12px 30px; border-radius: 15px; font-size: 1.1rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 0 #2E86DE; }
         .form-card { background: white; padding: 20px; border-radius: 25px; border: 5px solid #54A0FF; }
-        .form-group { margin-bottom: 10px; text-align: left; }
-        label { display: block; margin-bottom: 5px; font-weight: 800; font-size: 0.9rem; font-family: 'Baloo 2', cursive; }
-        input[type="text"], select { width: 100%; padding: 10px; border-radius: 12px; border: 2px solid #F0F2F5; font-size: 0.9rem; background: #F8F9FA; }
         .btn-save { width: 100%; padding: 12px; border-radius: 15px; border: none; background: #1DD1A1; color: white; font-weight: 800; font-size: 1.1rem; cursor: pointer; margin-top: 10px; box-shadow: 0 5px 0 #10AC84; }
 
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
         @media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } .options-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body class="theme-modern">
+    <div id="theme-menu" class="theme-selector">
+        <div class="theme-option" onclick="setTheme('modern')">🌈 Gökkuşağı</div>
+        <div class="theme-option" onclick="setTheme('classic')">🌸 Klasik</div>
+        <div class="theme-option" onclick="setTheme('space')">🚀 Uzay</div>
+    </div>
     <div id="app"></div>
 
     <script>
         let db;
-        const DB_NAME = 'KonusuyorumFinalDB_V4';
+        const DB_NAME = 'KonusuyorumFinalDB_V5';
         const DB_VERSION = 1;
 
-        // TEMA YÖNETİMİ
         let currentTheme = localStorage.getItem('app-theme') || 'modern';
         document.body.className = 'theme-' + currentTheme;
 
-        function toggleTheme() {
-            currentTheme = currentTheme === 'modern' ? 'classic' : 'modern';
-            document.body.className = 'theme-' + currentTheme;
-            localStorage.setItem('app-theme', currentTheme);
+        function toggleThemeMenu() {
+            const menu = document.getElementById('theme-menu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            document.body.className = 'theme-' + theme;
+            localStorage.setItem('app-theme', theme);
+            document.getElementById('theme-menu').style.display = 'none';
             render();
         }
 
@@ -183,7 +166,7 @@
 
         async function render() {
             const hash = window.location.hash || '#/';
-            app.innerHTML = '<div style="text-align:center;padding:100px;font-size:3rem">🌈</div>';
+            app.innerHTML = '<div style="text-align:center;padding:100px;font-size:3rem">🎨</div>';
 
             try {
                 if (hash === '#/') {
@@ -235,13 +218,12 @@
         }
 
         function getHeader(title, backHash = null, extraBtn = null) {
+            const themeIcons = { modern: '🌈', classic: '🌸', space: '🚀' };
             return `
                 <div class="header">
-                    ${backHash ? `<button class="btn-round" onclick="navigate('${backHash}')">⬅️</button>` : `<button class="btn-round" onclick="toggleTheme()">${currentTheme === 'modern' ? '🌸' : '🌈'}</button>`}
+                    ${backHash ? `<button class="btn-round" onclick="navigate('${backHash}')">⬅️</button>` : `<button class="btn-round" onclick="toggleThemeMenu()">${themeIcons[currentTheme]}</button>`}
                     <h1>${title}</h1>
-                    <div class="nav-buttons">
-                        ${extraBtn || ''}
-                    </div>
+                    <div class="nav-buttons">${extraBtn || ''}</div>
                 </div>
             `;
         }
@@ -254,7 +236,7 @@
                             <button class="btn-mini btn-del" onclick="event.stopPropagation(); deletePerson('${p.id}')">✕</button>
                             <button class="btn-mini btn-edit" onclick="event.stopPropagation(); navigate('#/edit-person/${p.id}')">✎</button>
                         </div>
-                        <div class="card-img">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:18px;object-fit:cover">` : '👤'}</div>
+                        <div class="card-img">${p.avatar ? `<img src="${p.avatar}" style="width:100%;height:100%;border-radius:15px;object-fit:cover">` : '👤'}</div>
                         <div class="card-title">${p.name}</div>
                     </div>`).join('')}</div></div>`;
         }
@@ -320,7 +302,7 @@
                             <button class="btn-mini btn-del" onclick="event.stopPropagation(); deleteItem('${person.id}', '${category.id}', '${i.id}')">✕</button>
                             <button class="btn-mini btn-edit" onclick="event.stopPropagation(); navigate('#/edit-item/${person.id}/${category.id}/${i.id}')">✎</button>
                         </div>
-                        <div class="card-img">${i.image ? `<img src="${i.image}" style="width:100%;height:100%;border-radius:18px;object-fit:cover">` : '💬'}</div>
+                        <div class="card-img">${i.image ? `<img src="${i.image}" style="width:100%;height:100%;border-radius:15px;object-fit:cover">` : '💬'}</div>
                         <div class="card-title">${i.text}</div>
                     </div>`).join('')}</div></div>`;
         }
@@ -353,7 +335,7 @@
                 <div class="container"><div class="grid">${(person.quizzes || []).map(q => `
                     <div class="card quiz" onclick="navigate('#/quiz-play/${person.id}/${q.id}')">
                         <button class="btn-mini btn-del" style="position:absolute;top:5px;right:5px" onclick="event.stopPropagation(); deleteQuiz('${person.id}', '${q.id}')">✕</button>
-                        <div class="card-img">${q.image ? `<img src="${q.image}" style="width:100%;height:100%;border-radius:18px;object-fit:cover">` : '❓'}</div>
+                        <div class="card-img">${q.image ? `<img src="${q.image}" style="width:100%;height:100%;border-radius:15px;object-fit:cover">` : '❓'}</div>
                         <div class="card-title">${q.question}</div>
                     </div>`).join('')}</div></div>`;
         }
