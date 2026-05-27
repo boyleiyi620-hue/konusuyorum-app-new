@@ -34,10 +34,15 @@
         .theme-space .rocket { font-size: 5rem; animation: roam 35s infinite ease-in-out; }
         .theme-space .planet { font-size: 9rem; animation: slowSpin 60s infinite linear; opacity: 0.4; }
         .theme-space .star { background: white; border-radius: 50%; animation: twinkle 3s infinite; }
-        .theme-space .shooting-star { 
-            width: 250px; height: 1px; 
-            background: linear-gradient(90deg, rgba(255,255,255,0.9), transparent); 
-            animation: shootRealistic 15s infinite linear; opacity: 0;
+        .theme-space .shooting-star {
+            width: 2px; /* Daha küçük, bir nokta gibi */
+            height: 2px; /* Daha küçük, bir nokta gibi */
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 70%); /* Parlayan merkez, dışa doğru solan */
+            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.5); /* Parlama efekti */
+            border-radius: 50%; /* Yuvarlak yap */
+            animation: shootRealistic 5s infinite cubic-bezier(0.4, 0, 1, 1); /* Daha hızlı, hızlanan hareket */
+            opacity: 0;
+            transform-origin: 100% 50%; /* Kendi ucunda dönsün */
         }
 
         /* GÖKKUŞAĞI */
@@ -69,10 +74,18 @@
 
         /* ANİMASYON TANIMLARI */
         @keyframes shootRealistic {
-            0% { transform: translate(-100px, -100px) rotate(-30deg); opacity: 0; }
-            2% { opacity: 1; }
-            10% { transform: translate(120vw, 70vh) rotate(-30deg); opacity: 0; }
-            100% { opacity: 0; }
+            0% {
+                transform: translate(-100vw, -10vh) rotate(-45deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translate(-50vw, 5vh) rotate(-45deg) scale(0.8);
+            }
+            100% {
+                transform: translate(150vw, 100vh) rotate(-45deg) scale(1.2);
+                opacity: 0;
+            }
         }
         @keyframes roam {
             0% { transform: translate(-20vw, 120vh) rotate(0deg); }
@@ -210,7 +223,7 @@
             
             if (currentTheme === 'space') {
                 for(let i=0; i<35; i++) container.innerHTML += `<div class="star anim-item" style="top:${Math.random()*100}%;left:${Math.random()*100}%;width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;animation-delay:${Math.random()*3}s"></div>`;
-                for(let i=0; i<8; i++) container.innerHTML += `<div class="shooting-star anim-item" style="top:${Math.random()*60}%;left:${Math.random()*40}%;animation-delay:${i*4}s"></div>`;
+                for(let i=0; i<10; i++) container.innerHTML += `<div class="shooting-star anim-item" style="top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*10}s"></div>`;
                 container.innerHTML += `<div class="rocket anim-item">🚀</div>`;
                 container.innerHTML += `<div class="planet anim-item" style="top:15%;right:15%">🌍</div>`;
                 container.innerHTML += `<div class="planet anim-item" style="bottom:20%;left:10%;animation-duration:60s">🪐</div>`;
