@@ -26,7 +26,9 @@
 
         /* ARKA PLAN ANİMASYONLARI */
         .bg-animations { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
-        .anim-item { position: absolute; }
+        .anim-item { position: absolute; transition: transform 0.2s; }
+        .clickable-item { pointer-events: auto; cursor: pointer; }
+        .clickable-item:active { transform: scale(1.5); }
 
         /* UZAY - GERÇEKÇİ */
         .theme-space .rocket { font-size: 5rem; animation: roam 35s infinite ease-in-out; }
@@ -125,6 +127,18 @@
         .theme-option { padding: 10px 15px; cursor: pointer; font-weight: 800; border-radius: 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 12px; color: #4834D4; font-size: 1.1rem; }
         .theme-option:hover { background: #f0f0f0; }
 
+        .score-board { background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 20px; margin-bottom: 15px; display: flex; justify-content: space-around; border: 3px solid var(--primary); font-weight: 800; }
+        .theme-space .score-board { background: rgba(30, 41, 59, 0.9); color: white; border-color: #38bdf8; }
+
+        /* MEMORY GAME STYLES */
+        .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .memory-card { height: 100px; background: var(--primary); border-radius: 15px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.5s; border: 4px solid white; }
+        .memory-card.flipped { transform: rotateY(180deg); }
+        .memory-card.matched { visibility: hidden; opacity: 0; }
+        .card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+        .card-back { background: #fff; transform: rotateY(180deg); }
+        .card-back img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+
         .quiz-container { background: white; border-radius: 35px; padding: 25px; text-align: center; border: 8px solid #FFB300; }
         .quiz-question { font-family: 'Baloo 2', cursive; font-size: 1.8rem; margin-bottom: 20px; font-weight: 800; }
         .quiz-img { width: 100%; max-width: 280px; height: 180px; border-radius: 25px; object-fit: cover; margin-bottom: 20px; }
@@ -136,7 +150,7 @@
         .theme-space .form-card { background: #1e293b; border-color: #38bdf8; }
         .btn-save { width: 100%; padding: 15px; border-radius: 20px; border: none; background: #1DD1A1; color: white; font-weight: 800; font-size: 1.2rem; cursor: pointer; margin-top: 10px; box-shadow: 0 6px 0 #10AC84; }
 
-        @media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } .options-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 480px) { .grid { grid-template-columns: repeat(2, 1fr); } .options-grid { grid-template-columns: 1fr; } .memory-grid { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
 <body class="theme-modern">
@@ -172,27 +186,57 @@
             render();
         }
 
+        let popGameActive = false;
+        let popScore = 0;
+        let currentPersonId = null;
+
         function updateBackground() {
             const container = document.getElementById('bg-elements');
             container.innerHTML = '';
             
+            const createItem = (emoji, className, clickable = false) => {
+                const item = document.createElement('div');
+                item.className = `${className} anim-item ${clickable ? 'clickable-item' : ''}`;
+                item.innerHTML = emoji;
+                if (clickable) {
+                    item.onclick = (e) => {
+                        if (popGameActive) {
+                            popScore++;
+                            speak("Pat!");
+                            confetti({ particleCount: 20, spread: 30, origin: { x: e.clientX/window.innerWidth, y: e.clientY/window.innerHeight } });
+                            item.remove();
+                            updatePopScoreUI();
+                        }
+                    };
+                }
+                return item;
+            };
+
             if (currentTheme === 'space') {
                 for(let i=0; i<35; i++) container.innerHTML += `<div class="star anim-item" style="top:${Math.random()*100}%;left:${Math.random()*100}%;width:${1+Math.random()*3}px;height:${1+Math.random()*3}px;animation-delay:${Math.random()*3}s"></div>`;
                 for(let i=0; i<8; i++) container.innerHTML += `<div class="shooting-star anim-item" style="top:${Math.random()*60}%;left:${Math.random()*40}%;animation-delay:${i*4}s"></div>`;
-                container.innerHTML += `<div class="rocket anim-item">🚀</div>`;
+                container.appendChild(createItem('🚀', 'rocket', true));
                 container.innerHTML += `<div class="planet anim-item" style="top:15%;right:15%">🌍</div>`;
                 container.innerHTML += `<div class="planet anim-item" style="bottom:20%;left:10%;animation-duration:60s">🪐</div>`;
             } else if (currentTheme === 'modern') {
                 container.innerHTML += `<div class="sun anim-item">☀️</div>`;
                 for(let i=0; i<6; i++) container.innerHTML += `<div class="cloud anim-item" style="top:${10+i*15}%;animation-delay:${i*6}s;animation-duration:${40+Math.random()*30}s">☁️</div>`;
-                for(let i=0; i<12; i++) container.innerHTML += `<div class="balloon anim-item" style="animation-delay:${i*5}s;left:${Math.random()*90}%">🎈</div>`;
+                for(let i=0; i<12; i++) {
+                    const b = createItem('🎈', 'balloon', true);
+                    b.style.cssText = `animation-delay:${i*5}s;left:${Math.random()*90}%`;
+                    container.appendChild(b);
+                }
             } else if (currentTheme === 'classic') {
-                for(let i=0; i<15; i++) container.innerHTML += `<div class="heart anim-item" style="left:${Math.random()*90}%;animation-delay:${i*3}s">❤️</div>`;
+                for(let i=0; i<15; i++) {
+                    const h = createItem('❤️', 'heart', true);
+                    h.style.cssText = `left:${Math.random()*90}%;animation-delay:${i*3}s`;
+                    container.appendChild(h);
+                }
                 for(let i=0; i<8; i++) container.innerHTML += `<div class="flower anim-item" style="top:${Math.random()*80}%;left:${Math.random()*80}%;animation-delay:${i*4}s">🌸</div>`;
-                container.innerHTML += `<div class="butterfly anim-item">🦋</div>`;
+                container.appendChild(createItem('🦋', 'butterfly', true));
             } else if (currentTheme === 'notebook') {
-                container.innerHTML += `<div class="pencil anim-item">✏️</div>`;
-                for(let i=0; i<3; i++) container.innerHTML += `<div class="paperclip anim-item" style="top:10+i*30}%;right:${5+i*10}%;animation-delay:${i*2}s">📎</div>`;
+                container.appendChild(createItem('✏️', 'pencil', true));
+                for(let i=0; i<3; i++) container.innerHTML += `<div class="paperclip anim-item" style="top:${10+i*30}%;right:${5+i*10}%;animation-delay:${i*2}s">📎</div>`;
                 container.innerHTML += `<div class="paperclip anim-item" style="bottom:10%;left:20%">📌</div>`;
             }
         }
@@ -250,13 +294,15 @@
         async function render() {
             const hash = window.location.hash || '#/';
             app.innerHTML = '<div style="text-align:center;padding:100px;font-size:3rem">✨</div>';
+            popGameActive = false;
 
             try {
                 if (hash === '#/') {
                     const people = await peopleDB.getAll();
                     renderHome(people);
                 } else if (hash.startsWith('#/person/')) {
-                    const person = await peopleDB.get(hash.split('/')[2]);
+                    currentPersonId = hash.split('/')[2];
+                    const person = await peopleDB.get(currentPersonId);
                     renderPerson(person);
                 } else if (hash.startsWith('#/category/')) {
                     const parts = hash.split('/');
@@ -294,8 +340,18 @@
                     renderItemForm(person.id, cat.id, item);
                 } else if (hash.startsWith('#/add-quiz/')) {
                     renderQuizForm(hash.split('/')[2]);
+                } else if (hash.startsWith('#/pop-game/')) {
+                    const person = await peopleDB.get(hash.split('/')[2]);
+                    renderPopGame(person);
+                } else if (hash.startsWith('#/memory-game/')) {
+                    const person = await peopleDB.get(hash.split('/')[2]);
+                    renderMemoryGame(person);
+                } else if (hash.startsWith('#/memory-setup/')) {
+                    const person = await peopleDB.get(hash.split('/')[2]);
+                    renderMemorySetup(person);
                 }
             } catch (err) {
+                console.error(err);
                 app.innerHTML = '<p style="padding:20px">Hata! Lütfen yenile 🛠️</p>';
             }
         }
@@ -337,7 +393,7 @@
             e.preventDefault();
             const name = document.getElementById('pName').value;
             const file = document.getElementById('pImg').files[0];
-            let person = id ? await peopleDB.get(id) : { id: generateId(), name, avatar: null, categories: [], quizzes: [] };
+            let person = id ? await peopleDB.get(id) : { id: generateId(), name, avatar: null, categories: [], quizzes: [], popHighScore: 0, memoryImages: [] };
             person.name = name;
             if (file) {
                 const reader = new FileReader();
@@ -348,7 +404,9 @@
 
         function renderPerson(person) {
             app.innerHTML = getHeader(person.name, '#/', `
-                <button class="btn-round" style="background:#FF9F43;color:white" onclick="navigate('#/quiz-list/${person.id}')">🎮</button>
+                <button class="btn-round" style="background:#FF9F43;color:white" onclick="navigate('#/pop-game/${person.id}')">🎈</button>
+                <button class="btn-round" style="background:#1DD1A1;color:white" onclick="navigate('#/memory-game/${person.id}')">🧩</button>
+                <button class="btn-round" style="background:#54A0FF;color:white" onclick="navigate('#/quiz-list/${person.id}')">🎮</button>
                 <button class="btn-round btn-secondary" onclick="navigate('#/add-category/${person.id}')">＋</button>
             `) + `
                 <div class="container"><div class="grid">${(person.categories || []).map(c => `
@@ -361,6 +419,133 @@
                     </div>`).join('')}</div></div>`;
         }
 
+        // POP GAME
+        function renderPopGame(person) {
+            popGameActive = true;
+            popScore = 0;
+            app.innerHTML = getHeader('Patlatma Oyunu', '#/person/' + person.id) + `
+                <div class="container">
+                    <div class="score-board" id="pop-score-board">
+                        <span>Skor: <span id="current-pop-score">0</span></span>
+                        <span>En Yüksek: ${person.popHighScore || 0}</span>
+                    </div>
+                    <p style="text-align:center; font-weight:800; font-size:1.2rem;">Ekranda çıkan objeleri patlat! 💥</p>
+                </div>`;
+            
+            const gameInterval = setInterval(() => {
+                if (!popGameActive) { clearInterval(gameInterval); return; }
+                updateBackground();
+            }, 3000);
+        }
+
+        function updatePopScoreUI() {
+            document.getElementById('current-pop-score').innerText = popScore;
+            peopleDB.get(currentPersonId).then(person => {
+                if (popScore > (person.popHighScore || 0)) {
+                    person.popHighScore = popScore;
+                    peopleDB.save(person);
+                }
+            });
+        }
+
+        // MEMORY GAME
+        let memoryFlipped = [];
+        let memoryMatched = 0;
+
+        async function renderMemoryGame(person) {
+            if (!person.memoryImages || person.memoryImages.length < 2) {
+                renderMemorySetup(person);
+                return;
+            }
+            
+            const cards = [...person.memoryImages, ...person.memoryImages]
+                .sort(() => Math.random() - 0.5)
+                .map((img, idx) => ({ id: idx, img }));
+
+            memoryFlipped = [];
+            memoryMatched = 0;
+
+            app.innerHTML = getHeader('Hafıza Oyunu', '#/person/' + person.id, `<button class="btn-round" onclick="navigate('#/memory-setup/${person.id}')">⚙️</button>`) + `
+                <div class="container">
+                    <div class="memory-grid" id="memory-grid">
+                        ${cards.map(c => `
+                            <div class="memory-card" onclick="flipMemoryCard(this, '${c.img}')">
+                                <div class="card-front">❓</div>
+                                <div class="card-back"><img src="${c.img}"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+        }
+
+        window.flipMemoryCard = (card, img) => {
+            if (card.classList.contains('flipped') || card.classList.contains('matched') || memoryFlipped.length >= 2) return;
+            
+            card.classList.add('flipped');
+            memoryFlipped.push({ card, img });
+
+            if (memoryFlipped.length === 2) {
+                if (memoryFlipped[0].img === memoryFlipped[1].img) {
+                    setTimeout(() => {
+                        memoryFlipped.forEach(f => f.card.classList.add('matched'));
+                        memoryFlipped = [];
+                        memoryMatched += 2;
+                        speak("Harika!");
+                        if (document.querySelectorAll('.memory-card:not(.matched)').length === 0) {
+                            confetti({ particleCount: 200, spread: 100 });
+                            speak("Tebrikler! Hepsini buldun!");
+                        }
+                    }, 600);
+                } else {
+                    setTimeout(() => {
+                        memoryFlipped.forEach(f => f.card.classList.remove('flipped'));
+                        memoryFlipped = [];
+                    }, 1000);
+                }
+            }
+        };
+
+        function renderMemorySetup(person) {
+            app.innerHTML = getHeader('Hafıza Kartları', '#/person/' + person.id) + `
+                <div class="container">
+                    <div class="form-card">
+                        <label style="font-weight:800; display:block; margin-bottom:10px;">Resim Ekle (En az 2 tane)</label>
+                        <input type="file" id="memImg" accept="image/*" onchange="addMemoryImage('${person.id}')">
+                        <div class="grid" style="margin-top:20px;">
+                            ${(person.memoryImages || []).map((img, idx) => `
+                                <div class="card" style="padding:5px;">
+                                    <button class="btn-mini btn-del" style="position:absolute; top:5px; right:5px;" onclick="removeMemoryImage('${person.id}', ${idx})">✕</button>
+                                    <img src="${img}" style="width:100%; height:80px; object-fit:cover; border-radius:10px;">
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn-save" onclick="navigate('#/memory-game/${person.id}')" style="margin-top:20px;">Oyuna Başla 🧩</button>
+                    </div>
+                </div>`;
+        }
+
+        window.addMemoryImage = async (pid) => {
+            const file = document.getElementById('memImg').files[0];
+            if (!file) return;
+            const person = await peopleDB.get(pid);
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                if (!person.memoryImages) person.memoryImages = [];
+                person.memoryImages.push(e.target.result);
+                await peopleDB.save(person);
+                renderMemorySetup(person);
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.removeMemoryImage = async (pid, idx) => {
+            const person = await peopleDB.get(pid);
+            person.memoryImages.splice(idx, 1);
+            await peopleDB.save(person);
+            renderMemorySetup(person);
+        };
+
+        // ... Diğer fonksiyonlar (Category, Item, Quiz vb.) aynı kalacak ...
         function renderCategoryForm(pid, editData = null) {
             app.innerHTML = getHeader(editData ? 'Düzenle' : 'Yeni Kategori', '#/person/' + pid) + `
                 <div class="container"><div class="form-card"><form onsubmit="handleSaveCategory(event, '${pid}', ${editData ? `'${editData.id}'` : 'null'})">
@@ -473,13 +658,13 @@
             navigate('#/quiz-list/' + pid);
         }
 
-        window.deletePerson = async (id) => { if(confirm('Silinsin mi?')) { await peopleDB.delete(id); render(); } };
-        window.deleteQuiz = async (pid, qid) => { if(confirm('Soru silinsin mi?')) { const p = await peopleDB.get(pid); p.quizzes = p.quizzes.filter(q => q.id !== qid); await peopleDB.save(p); render(); } };
-        window.deleteCategory = async (pid, cid) => { if(confirm('Silinsin mi?')) { const p = await peopleDB.get(pid); p.categories = p.categories.filter(c => c.id !== cid); await peopleDB.save(p); render(); } };
-        window.deleteItem = async (pid, cid, iid) => { if(confirm('Silinsin mi?')) { const p = await peopleDB.get(pid); const c = p.categories.find(cat => cat.id === cid); c.items = c.items.filter(i => i.id !== iid); await peopleDB.save(p); render(); } };
+        window.deletePerson = async (id) => { if(confirm('Bu kişiyi silmek istediğine emin misin?')) { await peopleDB.delete(id); render(); } };
+        window.deleteCategory = async (pid, cid) => { if(confirm('Bu kategoriyi silmek istediğine emin misin?')) { const p = await peopleDB.get(pid); p.categories = p.categories.filter(c => c.id !== cid); await peopleDB.save(p); render(); } };
+        window.deleteItem = async (pid, cid, iid) => { if(confirm('Bu kelimeyi silmek istediğine emin misin?')) { const p = await peopleDB.get(pid); const c = p.categories.find(cat => cat.id === cid); c.items = c.items.filter(i => i.id !== iid); await peopleDB.save(p); render(); } };
+        window.deleteQuiz = async (pid, qid) => { if(confirm('Bu soruyu silmek istediğine emin misin?')) { const p = await peopleDB.get(pid); p.quizzes = p.quizzes.filter(q => q.id !== qid); await peopleDB.save(p); render(); } };
 
         window.addEventListener('hashchange', render);
-        window.addEventListener('load', async () => { await initDB(); updateBackground(); render(); });
+        initDB().then(() => { updateBackground(); render(); });
     </script>
 </body>
 </html>
