@@ -1306,30 +1306,36 @@
         }
 
         function renderQuizCategories(person) {
-            const cats = person.quizCategories || ['Genel'];
+            const cats = person.quizCategories || [];
             
-            app.innerHTML = getHeader('Quiz Kategorileri', '#/person/' + person.id, `<button class="btn-round btn-secondary" onclick="renderAddQuizCategory('${person.id}')">＋ Yeni Kategori</button>`) + `
+            app.innerHTML = getHeader('Soru Kategorileri', '#/person/' + person.id, `<button class="btn-round btn-secondary" onclick="renderAddQuizCategory('${person.id}')">＋ Yeni Kategori</button>`) + `
                 <div class="container">
-                    <div class="grid">
-                        ${cats.map(c => `
-                            <div class="card category" onclick="navigate('#/quiz-cat-detail/${person.id}/${encodeURIComponent(c)}')">
-                                <div class="action-btns">
-                                    <button class="btn-mini btn-del" onclick="event.stopPropagation(); deleteQuizCategory('${person.id}', '${c.replace(/'/g, "\\'")}')">✕</button>
-                                    <button class="btn-mini btn-edit" onclick="event.stopPropagation(); renderEditQuizCategory('${person.id}', '${c.replace(/'/g, "\\'")}')">✎</button>
+                    ${cats.length === 0 ? `
+                        <div style="text-align:center; padding:50px; background:rgba(255,255,255,0.7); border-radius:30px; border:4px dashed #54A0FF; margin-top:20px;">
+                            <p style="font-size:1.5rem; color:#666; font-weight:700;">Henüz kategori yok 📚</p>
+                            <p style="color:#888; margin-top:10px;">Yeni bir kategori ekleyerek başlayabilirsin!</p>
+                        </div>
+                    ` : `
+                        <div class="grid">
+                            ${cats.map(c => `
+                                <div class="card category" onclick="navigate('#/quiz-cat-detail/${person.id}/${encodeURIComponent(c)}')">
+                                    <div class="action-btns">
+                                        <button class="btn-mini btn-del" onclick="event.stopPropagation(); deleteQuizCategory('${person.id}', '${c.replace(/'/g, "\\'")}')">✕</button>
+                                        <button class="btn-mini btn-edit" onclick="event.stopPropagation(); renderEditQuizCategory('${person.id}', '${c.replace(/'/g, "\\'")}')">✎</button>
+                                    </div>
+                                    <div class="card-img">📚</div>
+                                    <div class="card-title">${c}</div>
                                 </div>
-                                <div class="card-img">📚</div>
-                                <div class="card-title">${c}</div>
-                            </div>
-                        `).join('')}
-                    </div>
+                            `).join('')}
+                        </div>
+                    `}
                 </div>`;
         }
 
         async function deleteQuizCategory(pid, catName) {
-            if(catName === 'Genel') { alert("Genel kategorisi silinemez."); return; }
             if(confirm(`"${catName}" kategorisini ve içindeki tüm soruları silmek istediğine emin misin?`)) {
                 const person = await peopleDB.get(pid);
-                person.quizCategories = person.quizCategories.filter(c => c !== catName);
+                person.quizCategories = (person.quizCategories || []).filter(c => c !== catName);
                 person.quizzes = (person.quizzes || []).filter(q => q.category !== catName);
                 await peopleDB.save(person);
                 render();
@@ -1363,63 +1369,61 @@
         }
 
         async function handleUpdateQuizCategory(pid, oldName) {
-            const btn = event.target;
+            const btn = document.querySelector('.btn-save');
             const newName = document.getElementById('editQuizCatName').value.trim();
             if(!newName || newName === oldName) { navigate('#/quiz-list/' + pid); return; }
             
             btn.disabled = true;
             btn.innerText = "Güncelleniyor...";
             
-            const person = await peopleDB.get(pid);
-            person.quizCategories = person.quizCategories.map(c => c === oldName ? newName : c);
-            person.quizzes = (person.quizzes || []).map(q => {
-                if(q.category === oldName) q.category = newName;
-                return q;
-            });
-            await peopleDB.save(person);
-            speak("Kategori güncellendi!");
-            setTimeout(() => navigate('#/quiz-list/' + pid), 200);
+            try {
+                const person = await peopleDB.get(pid);
+                person.quizCategories = (person.quizCategories || []).map(c => c === oldName ? newName : c);
+                person.quizzes = (person.quizzes || []).map(q => {
+                    if(q.category === oldName) q.category = newName;
+                    return q;
+                });
+                await peopleDB.save(person);
+                speak("Kategori güncellendi!");
+                setTimeout(() => navigate('#/quiz-list/' + pid), 200);
+            } catch (err) {
+                console.error(err);
+                btn.disabled = false;
+                btn.innerText = "Güncelle ✎";
+            }
         }
 
         async function handleAddQuizCategory(pid) {
-            const btn = event.target;
+            const btn = document.querySelector('.btn-save');
             const nameInput = document.getElementById('newQuizCatName');
             const name = nameInput.value.trim();
             
-            if(!name) { 
-                alert("Lütfen bir kategori adı girin!"); 
-                return; 
-            }
+            if(!name) { alert("Lütfen bir kategori adı girin!"); return; }
             
             btn.disabled = true;
             btn.innerText = "Kaydediliyor...";
             
             try {
                 const person = await peopleDB.get(pid);
-                if(!person.quizCategories) person.quizCategories = ['Genel'];
+                if(!person.quizCategories) person.quizCategories = [];
                 
                 if(!person.quizCategories.includes(name)) {
                     person.quizCategories.push(name);
                     await peopleDB.save(person);
                 }
                 
-                speak("Kategori eklendi: " + name);
-                
-                // Kayıt işleminin IndexedDB'de bittiğinden emin olmak için
-                setTimeout(() => {
-                    navigate('#/quiz-list/' + pid);
-                }, 200);
-                
+                speak("Kategori oluşturuldu!");
+                setTimeout(() => navigate('#/quiz-list/' + pid), 200);
             } catch (err) {
-                console.error("Kategori kaydetme hatası:", err);
-                alert("Kayıt sırasında bir hata oluştu!");
+                console.error(err);
+                alert("Hata oluştu!");
                 btn.disabled = false;
                 btn.innerText = "Kategoriyi Oluştur ✨";
             }
         }
 
         function renderQuizList(person, categoryName) {
-            const filteredQuizzes = (person.quizzes || []).filter(q => (q.category || 'Genel') === categoryName);
+            const filteredQuizzes = (person.quizzes || []).filter(q => q.category === categoryName);
 
             app.innerHTML = getHeader(categoryName, '#/quiz-list/' + person.id, `<button class="btn-round btn-secondary" onclick="navigate('#/add-quiz/${person.id}/${encodeURIComponent(categoryName)}')">＋ Soru Ekle</button>`) + `
                 <div class="container">
@@ -1443,7 +1447,7 @@
         function renderQuizPlay(person, index) {
             const quiz = person.quizzes[index];
             if (!quiz) { navigate('#/quiz-list/' + person.id); return; }
-            const backHash = '#/quiz-cat-detail/' + person.id + '/' + encodeURIComponent(quiz.category || 'Genel');
+            const backHash = '#/quiz-cat-detail/' + person.id + '/' + encodeURIComponent(quiz.category);
             
             app.innerHTML = getHeader('Soru ' + (index + 1), backHash) + `
                 <div class="container">
