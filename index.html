@@ -550,16 +550,27 @@
         const generateId = () => Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
         const navigate = (hash) => { window.location.hash = hash; };
         
-        function speak(text, rate = 0.85, pitch = 1.2) {
-            if (!window.speechSynthesis) return;
+        function speak(text, rate = 0.85, pitch = 1.2, callback = null) {
+            if (!window.speechSynthesis) {
+                if (callback) callback();
+                return;
+            }
             try {
                 window.speechSynthesis.cancel();
                 const msg = new SpeechSynthesisUtterance(text);
                 msg.lang = 'tr-TR';
                 msg.rate = rate;
                 msg.pitch = pitch;
+                if (callback) {
+                    msg.onend = () => callback();
+                    // Fallback for some browsers where onend might not fire
+                    setTimeout(() => { if (msg.onend) { msg.onend = null; callback(); } }, text.length * 200 + 1000);
+                }
                 window.speechSynthesis.speak(msg);
-            } catch(e) { console.error('TTS error:', e); }
+            } catch(e) { 
+                console.error('TTS error:', e); 
+                if (callback) callback();
+            }
         }
 
         function stopAllGames() {
@@ -1818,8 +1829,8 @@
                     gameOver = true; // Sola kayma engeli
                 }
                 
-                // Otomatik sağa kayma
-                player.x += 2.5;
+                // Otomatik sağa kayma (Zamanla hızlanan)
+                player.x += 2.5 + (score / 2000);
                 
                 // Engel çarpışma
                 for (const o of obstacles) {
@@ -1913,27 +1924,21 @@
                     if (sx + p.w < -50 || sx > canvas.width + 50) continue;
                     
                     if (p.type === 'grass') {
-                        // Toprak
-                        ctx.fillStyle = '#8D6E63';
-                        ctx.fillRect(sx, p.y, p.w, p.h);
-                        // Çim üstü
-                        ctx.fillStyle = '#66BB6A';
-                        ctx.fillRect(sx, p.y, p.w, 6);
-                        // Çim detayı
-                        ctx.fillStyle = '#43A047';
-                        for (let gx = sx; gx < sx + p.w; gx += 12) {
-                            ctx.fillRect(gx, p.y - 3, 3, 6);
-                        }
-                    } else if (p.type === 'moving') {
-                        // Hareketli platform
-                        ctx.fillStyle = '#AB47BC';
-                        ctx.fillRect(sx, p.y, p.w, p.h);
-                        ctx.fillStyle = '#CE93D8';
-                        ctx.fillRect(sx, p.y, p.w, 4);
-                        // Ok işaretleri
-                        ctx.font = '14px sans-serif';
+                        // Bulut Platform (Çocuklara uygun)
                         ctx.fillStyle = 'white';
-                        ctx.fillText('⇅', sx + p.w / 2 - 7, p.y + 15);
+                        ctx.beginPath();
+                        ctx.arc(sx + 20, p.y + 10, 20, 0, Math.PI * 2);
+                        ctx.arc(sx + p.w - 20, p.y + 10, 20, 0, Math.PI * 2);
+                        ctx.rect(sx + 20, p.y - 10, p.w - 40, 40);
+                        ctx.fill();
+                        ctx.fillStyle = '#E1F5FE';
+                        ctx.fillRect(sx + 20, p.y + 15, p.w - 40, 5);
+                    } else if (p.type === 'moving') {
+                        // Şeker Platform
+                        ctx.fillStyle = '#F06292';
+                        ctx.fillRect(sx, p.y, p.w, p.h);
+                        ctx.fillStyle = 'white';
+                        for(let ix=0; ix<p.w; ix+=20) ctx.fillRect(sx+ix, p.y, 10, p.h);
                     }
                 }
                 
@@ -1986,9 +1991,11 @@
                 }
                 ctx.globalAlpha = 1;
                 
-                // Oyuncu
-                ctx.font = '32px serif';
-                ctx.fillText('😎', player.x - camera.x, player.y + 30);
+                // Oyuncu (Karakter seçimi veya rastgele)
+                const characters = ['🐱', '🚀', '🎈', '🐸', '🦄'];
+                const charIdx = Math.floor((score / 500) % characters.length);
+                ctx.font = '36px serif';
+                ctx.fillText(characters[charIdx], player.x - camera.x, player.y + 30);
                 
                 // Zemin çizgisi (sonsuz his)
                 ctx.fillStyle = 'rgba(129,199,132,0.3)';
@@ -2337,20 +2344,29 @@
             if (nameEl) nameEl.innerText = animal.name;
             if (soundEl) soundEl.innerText = '"' + animal.sound + '"';
             if (qEl) qEl.innerText = idx + 1;
-            if (statusEl) statusEl.innerHTML = '<span style="color:#54A0FF">&#127908; Hayvan sesini taklit etmek için butona bas!</span>';
-            if (nextEl) nextEl.style.display = 'none';
+            if (statusEl) statusEl.innerHTML = '<span style="color:#54A0FF">&#127908; Dinliyorum...</span>';
+            if (nextEl) {
+                nextEl.style.display = 'inline-block';
+                nextEl.innerHTML = 'Pas Geç';
+            }
             if (speakBtn) {
                 speakBtn.style.display = 'inline-block';
-                speakBtn.innerHTML = '&#127908; Sesi Tekrarla';
-                speakBtn.classList.remove('listening');
-                speakBtn.disabled = false;
+                speakBtn.innerHTML = '&#127908; Dinliyor...';
+                speakBtn.classList.add('listening');
+                speakBtn.disabled = true;
             }
+            // Otomatik çal ve dinlemeye başla
+            setTimeout(() => window.playAnimalSound(true), 500);
         }
-        window.playAnimalSound = () => {
+        window.playAnimalSound = (autoStartMic = false) => {
             const idx = voiceGameState.index;
             if (idx < 0 || idx >= VOICE_ANIMALS.length) return;
             const animal = VOICE_ANIMALS[idx];
-            speak(animal.sound + '! ' + animal.name + ' sesi!');
+            speak(animal.sound + '! ' + animal.name + ' sesi!', 0.85, 1.2, () => {
+                if (autoStartMic) {
+                    setTimeout(() => window.startAnimalVoiceRecognition(), 500);
+                }
+            });
         };
         
         // Ses tanıma - Sadece SpeechRecognition (gerçek mikrofon)
