@@ -1845,4 +1845,40 @@
                 msg.innerHTML = '<span style="color:#1DD1A1">Tebrikler! Yapboz tamamlandi!</span>';
                 speak('Tebrikler! Yapboz tamamlandi!');
                 confetti({ particleCount: 200, spread: 100 });
-                if (puzzleState.person
+                if (puzzleState.personId) {
+                    const person = await peopleDB.get(puzzleState.personId);
+                    if (person) {
+                        person.puzzleCompleted = (person.puzzleCompleted || 0) + 1;
+                        await peopleDB.save(person);
+                    }
+                }
+            } else {
+                msg.innerHTML = '<span style="color:#FF6B6B">Henüz bitmedi, denemeye devam et!</span>';
+                speak('Henüz bitmedi, denemeye devam et!');
+            }
+        };
+
+        // ==================== INIT ====================
+        window.addEventListener('hashchange', render);
+        // Service Worker Kaydı
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Error', err));
+            });
+        }
+
+        window.addEventListener('load', async () => {
+            try {
+                await initDB();
+                updateBackground();
+                render();
+            } catch (err) {
+                console.error('App init error:', err);
+                app.innerHTML = '<div style="padding:20px;text-align:center"><h2>Hata!</h2><p>' + err.message + '</p></div>';
+            }
+        });
+    </script>
+</body>
+</html>
