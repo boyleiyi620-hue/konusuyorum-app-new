@@ -358,10 +358,10 @@
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
                 request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
+                    const upgradeDb = e.target.result;
                     const oldVersion = e.oldVersion;
-                    if (!db.objectStoreNames.contains('people')) {
-                        db.createObjectStore('people', { keyPath: 'id' });
+                    if (!upgradeDb.objectStoreNames.contains('people')) {
+                        upgradeDb.createObjectStore('people', { keyPath: 'id' });
                     }
                     if (oldVersion < 2) {
                         try {
@@ -465,7 +465,7 @@
         };
 
         const generateId = () => Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-        const navigate = (hash) => { window.location.hash = hash; };
+        const navigate = (hash) => { window.location.hash = hash; if (window.location.hash === hash) render(); };
         
         function speak(text, rate = 0.85, pitch = 1.2, callback = null) {
             if (!window.speechSynthesis) {
@@ -1205,6 +1205,237 @@
                 }
             }
         };
+
+        // ===== RENK ESLESTIRME (BALLOON GAME) =====
+        function renderBalloonGame(person) {
+            const pid = person && person.id ? person.id : 'any';
+            app.innerHTML = getHeader('Renk Eslestirme', '#/') + `
+                <div class="container">
+                    <div class="score-board">
+                        <span>Skor: <span id="balloon-score">0</span></span>
+                    </div>
+                    <div class="quiz-container">
+                        <div id="balloon-target" style="font-size:1.5rem;margin-bottom:20px;font-weight:800"></div>
+                        <div class="grid" id="balloon-grid"></div>
+                    </div>
+                </div>`;
+            startBalloonGame(pid);
+        }
+        function startBalloonGame(pid) {
+            const colors = [
+                { name: 'Kirmizi', code: '#FF6B6B' },
+                { name: 'Mavi', code: '#54A0FF' },
+                { name: 'Yesil', code: '#1DD1A1' },
+                { name: 'Sari', code: '#FFB300' },
+                { name: 'Turuncu', code: '#FF9F43' },
+                { name: 'Mor', code: '#A29BFE' }
+            ];
+            let score = 0;
+            function nextRound() {
+                const target = colors[Math.floor(Math.random() * colors.length)];
+                document.getElementById('balloon-target').innerText = target.name + ' balonu bul!';
+                speak(target.name + ' balonu bul!');
+                const grid = document.getElementById('balloon-grid');
+                grid.innerHTML = '';
+                [...colors].sort(() => Math.random() - 0.5).forEach(c => {
+                    const btn = document.createElement('div');
+                    btn.className = 'card';
+                    btn.style.background = c.code;
+                    btn.style.height = '100px';
+                    btn.innerHTML = '<div style="font-size:3rem">🎈</div>';
+                    btn.onclick = () => {
+                        if (c.name === target.name) {
+                            score++;
+                            document.getElementById('balloon-score').innerText = score;
+                            speak('Harika!');
+                            confetti({ particleCount: 50, spread: 30 });
+                            setTimeout(nextRound, 1000);
+                        } else {
+                            speak('Bu ' + c.name + ', tekrar dene!');
+                        }
+                    };
+                    grid.appendChild(btn);
+                });
+            }
+            nextRound();
+        }
+
+        // ===== HAYVAN BILMECE (ANIMAL GAME) =====
+        function renderAnimalGame(person) {
+            const pid = person && person.id ? person.id : 'any';
+            app.innerHTML = getHeader('Hayvan Bilmece', '#/') + `
+                <div class="container">
+                    <div class="score-board"><span>Skor: <span id="animal-score">0</span></span></div>
+                    <div class="quiz-container">
+                        <div id="animal-question" style="font-size:1.5rem;margin-bottom:20px;font-weight:800"></div>
+                        <div class="grid" id="animal-grid"></div>
+                    </div>
+                </div>`;
+            startAnimalGame(pid);
+        }
+        function startAnimalGame(pid) {
+            const animals = [
+                { name: 'Kedi', emoji: '🐱', sound: 'Miyav' },
+                { name: 'Köpek', emoji: '🐶', sound: 'Hav hav' },
+                { name: 'Aslan', emoji: '🦁', sound: 'Ruar' },
+                { name: 'Inek', emoji: '🐮', sound: 'Möö' },
+                { name: 'Ördek', emoji: '🦆', sound: 'Vak vak' },
+                { name: 'Maymun', emoji: '🐵', sound: 'Uu aa' }
+            ];
+            let score = 0;
+            function nextRound() {
+                const target = animals[Math.floor(Math.random() * animals.length)];
+                document.getElementById('animal-question').innerText = target.name + ' nerede?';
+                speak(target.name + ' nerede?');
+                const grid = document.getElementById('animal-grid');
+                grid.innerHTML = '';
+                [...animals].sort(() => Math.random() - 0.5).forEach(a => {
+                    const btn = document.createElement('div');
+                    btn.className = 'card';
+                    btn.innerHTML = `<div class="card-img" style="font-size:3rem">${a.emoji}</div>`;
+                    btn.onclick = () => {
+                        if (a.name === target.name) {
+                            score++;
+                            document.getElementById('animal-score').innerText = score;
+                            speak('Aferin! Bu bir ' + a.name);
+                            confetti({ particleCount: 50, spread: 30 });
+                            setTimeout(nextRound, 1000);
+                        } else {
+                            speak('Bu bir ' + a.name + ', tekrar dene!');
+                        }
+                    };
+                    grid.appendChild(btn);
+                });
+            }
+            nextRound();
+        }
+
+        // ===== SEKIL BILMECE (SHAPE GAME) =====
+        function renderShapeGame(person) {
+            const pid = person && person.id ? person.id : 'any';
+            app.innerHTML = getHeader('Sekil Bilmece', '#/') + `
+                <div class="container">
+                    <div class="score-board"><span>Skor: <span id="shape-score">0</span></span></div>
+                    <div class="quiz-container">
+                        <div id="shape-question" style="font-size:1.5rem;margin-bottom:20px;font-weight:800"></div>
+                        <div class="grid" id="shape-grid"></div>
+                    </div>
+                </div>`;
+            startShapeGame(pid);
+        }
+        function startShapeGame(pid) {
+            const shapes = [
+                { name: 'Kare', emoji: '🟦' },
+                { name: 'Daire', emoji: '🔴' },
+                { name: 'Yildiz', emoji: '⭐' },
+                { name: 'Üçgen', emoji: '🔺' },
+                { name: 'Kalp', emoji: '❤️' }
+            ];
+            let score = 0;
+            function nextRound() {
+                const target = shapes[Math.floor(Math.random() * shapes.length)];
+                document.getElementById('shape-question').innerText = target.name + ' seklini bul!';
+                speak(target.name + ' seklini bul!');
+                const grid = document.getElementById('shape-grid');
+                grid.innerHTML = '';
+                [...shapes].sort(() => Math.random() - 0.5).forEach(s => {
+                    const btn = document.createElement('div');
+                    btn.className = 'card';
+                    btn.innerHTML = `<div class="card-img" style="font-size:3rem">${s.emoji}</div>`;
+                    btn.onclick = () => {
+                        if (s.name === target.name) {
+                            score++;
+                            document.getElementById('shape-score').innerText = score;
+                            speak('Harika! Bu bir ' + s.name);
+                            confetti({ particleCount: 50, spread: 30 });
+                            setTimeout(nextRound, 1000);
+                        } else {
+                            speak('Bu bir ' + s.name + ', tekrar dene!');
+                        }
+                    };
+                    grid.appendChild(btn);
+                });
+            }
+            nextRound();
+        }
+
+        // ===== HAYVAN SESI TEKRAR (ANIMAL VOICE) =====
+        function renderAnimalVoice(person) {
+            const pid = person && person.id ? person.id : 'any';
+            app.innerHTML = getHeader('Hayvan Sesi Tekrar', '#/') + `
+                <div class="container">
+                    <div class="score-board"><span>Skor: <span id="voice-score">0</span></span></div>
+                    <div class="quiz-container">
+                        <div id="voice-instruction" style="font-size:1.5rem;margin-bottom:20px;font-weight:800">Hayvanin sesini cikar!</div>
+                        <div id="voice-animal" style="font-size:8rem;margin-bottom:20px"></div>
+                        <div class="mic-indicator" style="margin: 0 auto 20px; width: 200px;">
+                            <div class="mic-bar"><div class="mic-fill" id="voice-mic-fill"></div></div>
+                        </div>
+                        <button class="btn-save" id="voice-start-btn" onclick="window.startVoiceGame('${pid}')">Basla</button>
+                    </div>
+                </div>`;
+        }
+        window.startVoiceGame = async (pid) => {
+            const btn = document.getElementById('voice-start-btn');
+            if (btn) btn.style.display = 'none';
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                micAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                micAnalyser = micAudioContext.createAnalyser();
+                micAnalyser.fftSize = 256;
+                const source = micAudioContext.createMediaStreamSource(micStream);
+                source.connect(micAnalyser);
+                runAnimalVoiceGame(pid);
+            } catch(e) {
+                alert('Mikrofon erisimi gerekli!');
+                if (btn) btn.style.display = 'block';
+            }
+        };
+        function runAnimalVoiceGame(pid) {
+            const animals = [
+                { name: 'Kedi', emoji: '🐱', sound: 'Miyav' },
+                { name: 'Köpek', emoji: '🐶', sound: 'Hav hav' },
+                { name: 'Aslan', emoji: '🦁', sound: 'Ruar' },
+                { name: 'Inek', emoji: '🐮', sound: 'Möö' },
+                { name: 'Ördek', emoji: '🦆', sound: 'Vak vak' }
+            ];
+            let score = 0;
+            let currentAnimal = null;
+            let isListening = false;
+
+            function nextAnimal() {
+                currentAnimal = animals[Math.floor(Math.random() * animals.length)];
+                document.getElementById('voice-animal').innerText = currentAnimal.emoji;
+                document.getElementById('voice-instruction').innerText = currentAnimal.name + ' nasil ses cikarir?';
+                speak(currentAnimal.name + ' nasil ses cikarir?');
+                setTimeout(() => {
+                    speak(currentAnimal.sound);
+                    isListening = true;
+                }, 2000);
+            }
+
+            function update() {
+                if (!micAnalyser) return;
+                const dataArray = new Uint8Array(micAnalyser.frequencyBinCount);
+                micAnalyser.getByteFrequencyData(dataArray);
+                const level = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+                const fill = document.getElementById('voice-mic-fill');
+                if (fill) fill.style.width = Math.min(100, level * 2) + '%';
+
+                if (isListening && level > 25) {
+                    isListening = false;
+                    score++;
+                    document.getElementById('voice-score').innerText = score;
+                    speak('Harika taklit ettin!');
+                    confetti({ particleCount: 100, spread: 70 });
+                    setTimeout(nextAnimal, 2000);
+                }
+                requestAnimationFrame(update);
+            }
+
+            nextAnimal();
+            update();
+        }
 
         // ===== SES PARKURU OYUNU =====
         let parkourGame = null;
