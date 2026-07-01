@@ -5,7 +5,7 @@ import { inspectAttr } from 'kimi-plugin-inspect-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/',
+  base: './', // Göreli yollar PWA ikonları için bazen daha kararlıdır
   build: {
     assetsInlineLimit: 10000000,
   },
