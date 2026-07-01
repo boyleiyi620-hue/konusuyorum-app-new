@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>DostOS</title>
     
-    <!-- Cache-Control for PWA testing -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#f97316" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -17,39 +12,22 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="DostOS" />
     
-    <!-- Primary Icons (Cache busting with v=3) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png?v=3" />
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png?v=3" />
+    <!-- Absolute paths for GitHub Pages subfolder compatibility -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://boyleiyi620-hue.github.io/dostos-app-new/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="https://boyleiyi620-hue.github.io/dostos-app-new/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="https://boyleiyi620-hue.github.io/dostos-app-new/apple-touch-icon.png" />
     
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="apple-touch-icon.png?v=3" />
-    <link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon.png?v=3" />
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=3" />
-    <link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon.png?v=3" />
-
-    <!-- Android Chrome Icons -->
-    <link rel="icon" sizes="192x192" href="icon-192x192.png?v=3" />
-    <link rel="icon" sizes="512x512" href="icon-512x512.png?v=3" />
-    
-    <!-- Manifest -->
-    <link rel="manifest" href="manifest.json?v=3" />
+    <!-- Manifest with absolute path -->
+    <link rel="manifest" href="https://boyleiyi620-hue.github.io/dostos-app-new/manifest.json" />
   </head>
   <body>
     <div id="root"></div>
-    <!-- Script yolu göreli olmalı (alt klasör uyumu) -->
-    <script type="module" src="src/main.tsx"></script>
+    <script type="module" src="/dostos-app-new/src/main.tsx"></script>
     
     <script>
-      // Clear old service workers to force update
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister();
-          }
-        });
-        
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js?v=3')
+          navigator.serviceWorker.register('/dostos-app-new/sw.js')
             .then(reg => console.log('SW registered'))
             .catch(err => console.log('SW error', err));
         });

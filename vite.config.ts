@@ -4,7 +4,7 @@ import { defineConfig } from "vite"
 import { inspectAttr } from 'kimi-plugin-inspect-react'
 
 export default defineConfig({
-  base: '/dostos-app-new/', // GitHub Pages alt klasör yapısı için kritik
+  base: '/dostos-app-new/',
   plugins: [inspectAttr(), react()],
   resolve: {
     alias: {
