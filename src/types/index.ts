@@ -27,6 +27,19 @@ export interface Friend {
   since: string;
 }
 
+// Arkadaşlardan gelen paylaşımlar
+export interface SharedFeedItem {
+  id: string;
+  fromUserId: string;
+  fromUsername: string;
+  fromDisplayName: string;
+  toUserId: string;
+  type: string; // 'kesfet' | 'feed' | 'game' | 'music' | 'expense' | 'bbq' | 'challenge'
+  content: Record<string, any>;
+  read: boolean;
+  createdAt: string;
+}
+
 export interface KesfetItem {
   id: string;
   title: string;

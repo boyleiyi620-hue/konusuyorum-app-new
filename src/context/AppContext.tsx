@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import type {
   User, FriendRequest, Friend, AppData, Group,
-  Notification, TabId
+  Notification, TabId, SharedFeedItem
 } from '@/types';
 
 // ─── SUPABASE CLIENT ───
@@ -22,7 +22,7 @@ function escapeHtml(text: string | null | undefined): string {
   return div.innerHTML;
 }
 
-// ─── STORAGE KEYS (for local fallback) ───
+// ─── STORAGE KEYS ───
 const SESSION_KEY = 'dostos_session';
 
 // ─── DEFAULT DATA ───
@@ -58,7 +58,7 @@ function randomColor() {
   return COLORS[Math.floor(Math.random() * COLORS.length)];
 }
 
-// ─── CONTEXT ───
+// ─── CONTEXT TYPE ───
 interface AppContextType {
   // Auth
   currentUser: User | null;
@@ -67,7 +67,7 @@ interface AppContextType {
   logout: () => void;
   // Data
   data: AppData;
-  saveData: () => void;
+  saveData: (newData?: AppData) => Promise<void>;
   setData: React.Dispatch<React.SetStateAction<AppData>>;
   // Friends
   friends: Friend[];
@@ -85,6 +85,11 @@ interface AppContextType {
   switchGroup: (group: Group | null) => void;
   // Shared data
   sharedData: AppData;
+  // Shared feed (arkadaş paylaşımları)
+  sharedFeed: SharedFeedItem[];
+  sendToFriends: (type: string, content: object) => Promise<void>;
+  markFeedRead: (itemId: string) => Promise<void>;
+  refreshSharedFeed: () => Promise<void>;
   // Notifications
   addNotification: (text: string, icon?: string) => void;
   clearNotifications: () => void;
@@ -96,6 +101,8 @@ interface AppContextType {
   // Active tab
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
+  // Loading
+  isLoading: boolean;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -109,8 +116,12 @@ export function useApp(): AppContextType {
 // ─── PROVIDER ───
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem(SESSION_KEY);
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem(SESSION_KEY);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
   });
   const [data, setData] = useState<AppData>(defaultAppData());
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -119,17 +130,107 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [groups, setGroups] = useState<Group[]>([]);
   const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
   const [sharedData, setSharedData] = useState<AppData>(defaultAppData());
+  const [sharedFeed, setSharedFeed] = useState<SharedFeedItem[]>([]);
   const [activeTab, setActiveTab] = useState<TabId>('kesfet');
   const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Ref for friends (to use in callbacks without stale closure)
+  const friendsRef = useRef<Friend[]>([]);
+  useEffect(() => {
+    friendsRef.current = friends;
+  }, [friends]);
 
   // Load user data when logged in
   useEffect(() => {
     if (currentUser) {
-      loadUserData(currentUser.id);
-      loadAllUsers();
-      loadGroups();
+      setIsLoading(true);
+      Promise.all([
+        loadUserData(currentUser.id),
+        loadAllUsers(),
+        loadGroups(),
+        loadSharedFeed(currentUser.id),
+      ]).finally(() => setIsLoading(false));
     }
-  }, [currentUser]);
+  }, [currentUser?.id]);
+
+  // Realtime subscription for shared feed
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const channel = supabase
+      .channel(`shared_feed_${currentUser.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'shared_feed',
+          filter: `to_user_id=eq.${currentUser.id}`,
+        },
+        (payload) => {
+          const item = payload.new as any;
+          const feedItem: SharedFeedItem = {
+            id: item.id,
+            fromUserId: item.from_user_id,
+            fromUsername: item.from_username || '',
+            fromDisplayName: item.from_display_name || '',
+            toUserId: item.to_user_id,
+            type: item.type,
+            content: item.content,
+            read: item.read,
+            createdAt: item.created_at,
+          };
+          setSharedFeed(prev => [feedItem, ...prev]);
+          // Add notification
+          addNotificationLocal(`📨 Arkadaşından yeni ${getTypeLabel(item.type)} geldi!`, 'fa-share');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUser?.id]);
+
+  // Realtime subscription for friend requests
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const channel = supabase
+      .channel(`friend_requests_${currentUser.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'friend_requests',
+          filter: `to_user_id=eq.${currentUser.id}`,
+        },
+        () => {
+          refreshRequestsState(currentUser.id);
+          addNotificationLocal('👋 Yeni arkadaşlık isteği aldın!', 'fa-user-plus');
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentUser?.id]);
+
+  function getTypeLabel(type: string): string {
+    const labels: Record<string, string> = {
+      kesfet: 'öneri',
+      feed: 'gönderi',
+      game: 'oyun daveti',
+      music: 'müzik',
+      expense: 'harcama',
+      bbq: 'mangal daveti',
+      challenge: 'meydan okuma',
+    };
+    return labels[type] || 'içerik';
+  }
 
   // ─── LOAD FUNCTIONS ───
   const loadUserData = async (userId: string) => {
@@ -161,6 +262,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           since: new Date().toLocaleString('tr-TR'),
         }));
         setFriends(friendsList);
+        friendsRef.current = friendsList;
       }
 
       // Load friend requests
@@ -216,6 +318,37 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loadSharedFeed = async (userId: string) => {
+    try {
+      const { data: feedRes } = await supabase
+        .from('shared_feed')
+        .select(`
+          *,
+          sender:users!shared_feed_from_user_id_fkey(username, display_name)
+        `)
+        .eq('to_user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (feedRes) {
+        const items: SharedFeedItem[] = feedRes.map((f: any) => ({
+          id: f.id,
+          fromUserId: f.from_user_id,
+          fromUsername: f.sender?.username || '',
+          fromDisplayName: f.sender?.display_name || '',
+          toUserId: f.to_user_id,
+          type: f.type,
+          content: f.content,
+          read: f.read,
+          createdAt: f.created_at,
+        }));
+        setSharedFeed(items);
+      }
+    } catch (error) {
+      console.error('Error loading shared feed:', error);
+    }
+  };
+
   const refreshRequestsState = async (userId?: string) => {
     const uid = userId || currentUser?.id;
     if (!uid) return;
@@ -249,7 +382,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         .eq('status', 'pending');
 
       if (outgoingRes) {
-        setSentRequests(outgoingRes);
+        setSentRequests(outgoingRes.map((r: any) => ({
+          id: r.id,
+          fromUserId: r.from_user_id,
+          fromUsername: '',
+          fromDisplayName: '',
+          toUserId: r.to_user_id,
+          status: r.status,
+          createdAt: r.created_at,
+        })));
       }
     } catch (error) {
       console.error('Error refreshing requests:', error);
@@ -259,14 +400,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // ─── AUTH ───
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
     try {
-      const { data: users } = await supabase
+      const { data: users, error } = await supabase
         .from('users')
         .select('*')
-        .eq('username', username)
+        .eq('username', username.toLowerCase().trim())
         .eq('password', password)
         .single();
 
-      if (!users) return false;
+      if (error || !users) return false;
 
       const user: User = {
         id: users.id,
@@ -289,29 +430,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(async (username: string, password: string, displayName: string): Promise<boolean> => {
     try {
+      const cleanUsername = username.toLowerCase().trim();
+
       // Check if user exists
       const { data: existing } = await supabase
         .from('users')
         .select('id')
-        .eq('username', username)
-        .single();
+        .eq('username', cleanUsername)
+        .maybeSingle();
 
       if (existing) return false;
 
       // Create user
-      const { data: newUser } = await supabase
+      const { data: newUser, error } = await supabase
         .from('users')
         .insert([{
-          username,
+          username: cleanUsername,
           password,
-          display_name: displayName || username,
-          avatar: (displayName || username)[0].toUpperCase(),
+          display_name: displayName.trim() || cleanUsername,
+          avatar: (displayName.trim() || cleanUsername)[0].toUpperCase(),
           color: randomColor(),
         }])
         .select()
         .single();
 
-      if (!newUser) return false;
+      if (error || !newUser) return false;
 
       // Create app_data entry
       await supabase
@@ -347,37 +490,96 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setFriends([]);
     setFriendRequests([]);
     setSentRequests([]);
+    setSharedFeed([]);
+    setGroups([]);
+    setCurrentGroup(null);
   }, []);
 
   // ─── DATA PERSISTENCE ───
   const persistData = useCallback(async (newData: AppData) => {
-    if (currentUser) {
-      try {
-        await supabase
-          .from('app_data')
-          .update({ data: newData, updated_at: new Date().toISOString() })
-          .eq('user_id', currentUser.id);
+    if (!currentUser) return;
+    try {
+      await supabase
+        .from('app_data')
+        .upsert({
+          user_id: currentUser.id,
+          data: newData,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
 
-        // Also save to shared if in a group
-        if (currentGroup) {
-          await supabase
-            .from('shared_data')
-            .update({ data: newData, updated_at: new Date().toISOString() })
-            .eq('group_id', currentGroup.id);
-          setSharedData(newData);
-        }
-      } catch (error) {
-        console.error('Error persisting data:', error);
+      // Also save to shared if in a group
+      if (currentGroup) {
+        await supabase
+          .from('shared_data')
+          .update({ data: newData, updated_at: new Date().toISOString() })
+          .eq('group_id', currentGroup.id);
+        setSharedData(newData);
       }
+    } catch (error) {
+      console.error('Error persisting data:', error);
     }
   }, [currentUser, currentGroup]);
 
-  const saveData = useCallback(() => {
-    setData(prev => {
-      persistData(prev);
-      return prev;
-    });
+  const saveData = useCallback(async (newData?: AppData) => {
+    if (newData) {
+      setData(newData);
+      await persistData(newData);
+    } else {
+      setData(prev => {
+        persistData(prev);
+        return prev;
+      });
+    }
   }, [persistData]);
+
+  // ─── SHARED FEED (arkadaşlara paylaşım) ───
+  const sendToFriends = useCallback(async (type: string, content: object) => {
+    if (!currentUser) return;
+
+    const currentFriends = friendsRef.current;
+    if (currentFriends.length === 0) return;
+
+    try {
+      // Tüm arkadaşlara gönder
+      const inserts = currentFriends.map(friend => ({
+        from_user_id: currentUser.id,
+        to_user_id: friend.userId,
+        type,
+        content: {
+          ...content,
+          senderName: currentUser.displayName || currentUser.username,
+          senderUsername: currentUser.username,
+          sentAt: new Date().toISOString(),
+        },
+        read: false,
+      }));
+
+      await supabase.from('shared_feed').insert(inserts);
+    } catch (error) {
+      console.error('Error sending to friends:', error);
+    }
+  }, [currentUser]);
+
+  const markFeedRead = useCallback(async (itemId: string) => {
+    try {
+      await supabase
+        .from('shared_feed')
+        .update({ read: true })
+        .eq('id', itemId);
+
+      setSharedFeed(prev =>
+        prev.map(item => item.id === itemId ? { ...item, read: true } : item)
+      );
+    } catch (error) {
+      console.error('Error marking feed read:', error);
+    }
+  }, []);
+
+  const refreshSharedFeed = useCallback(async () => {
+    if (currentUser) {
+      await loadSharedFeed(currentUser.id);
+    }
+  }, [currentUser]);
 
   // ─── FRIENDS ───
   const sendFriendRequest = useCallback(async (toUsername: string): Promise<boolean> => {
@@ -387,10 +589,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const { data: targetUser } = await supabase
         .from('users')
         .select('id')
-        .eq('username', toUsername)
-        .single();
+        .eq('username', toUsername.toLowerCase().trim())
+        .maybeSingle();
 
       if (!targetUser || targetUser.id === currentUser.id) return false;
+
+      // Check if already friends
+      const alreadyFriend = friendsRef.current.find(f => f.userId === targetUser.id);
+      if (alreadyFriend) return false;
 
       // Check if request already exists
       const { data: existing } = await supabase
@@ -399,16 +605,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         .eq('from_user_id', currentUser.id)
         .eq('to_user_id', targetUser.id)
         .eq('status', 'pending')
-        .single();
+        .maybeSingle();
 
       if (existing) return false;
 
       // Create request
-      await supabase.from('friend_requests').insert([{
+      const { error } = await supabase.from('friend_requests').insert([{
         from_user_id: currentUser.id,
         to_user_id: targetUser.id,
         status: 'pending',
       }]);
+
+      if (error) return false;
 
       await refreshRequestsState();
       return true;
@@ -544,7 +752,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         .select('id')
         .eq('group_id', groupId)
         .eq('user_id', currentUser.id)
-        .single();
+        .maybeSingle();
 
       if (!existing) {
         await supabase.from('group_members').insert([{
@@ -564,7 +772,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const switchGroup = useCallback((group: Group | null) => {
     setCurrentGroup(group);
     if (group) {
-      // Load shared data for group
       supabase
         .from('shared_data')
         .select('data')
@@ -579,6 +786,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ─── NOTIFICATIONS ───
+  const addNotificationLocal = (text: string, icon: string = 'fa-bell') => {
+    const notif: Notification = {
+      id: generateId(),
+      text,
+      time: new Date().toLocaleString('tr-TR'),
+      icon,
+      read: false,
+    };
+    setData(prev => {
+      const newNotifs = [...prev.notifications, notif];
+      if (newNotifs.length > 50) newNotifs.shift();
+      return { ...prev, notifications: newNotifs };
+    });
+  };
+
   const addNotification = useCallback((text: string, icon: string = 'fa-bell') => {
     const notif: Notification = {
       id: generateId(),
@@ -642,6 +864,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       joinGroup,
       switchGroup,
       sharedData,
+      sharedFeed,
+      sendToFriends,
+      markFeedRead,
+      refreshSharedFeed,
       addNotification,
       clearNotifications,
       generateId,
@@ -650,6 +876,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       refreshRequests,
       activeTab,
       setActiveTab,
+      isLoading,
     }}>
       {children}
     </AppContext.Provider>

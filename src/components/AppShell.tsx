@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '@/context/AppContext';
-import { Crown, Bell, UserCircle, Plus, Compass, Trophy, Wallet, Wrench, Zap, Users } from 'lucide-react';
+import { Bell, UserCircle, Plus, Compass, Trophy, Wallet, Wrench, Zap, Users, Inbox, Loader2 } from 'lucide-react';
 import TabDiscover from './TabDiscover';
 import TabArena from './TabArena';
 import TabWallet from './TabWallet';
@@ -10,6 +10,7 @@ import FriendsModal from './FriendsModal';
 import NotifModal from './NotifModal';
 import ProfileModal from './ProfileModal';
 import FabModal from './FabModal';
+import SharedFeedModal from './SharedFeedModal';
 import type { TabId } from '@/types';
 
 const tabs: { id: TabId; label: string; icon: typeof Compass }[] = [
@@ -21,25 +22,46 @@ const tabs: { id: TabId; label: string; icon: typeof Compass }[] = [
 ];
 
 export default function AppShell() {
-  const { currentUser, data, activeTab, setActiveTab } = useApp();
+  const { currentUser, data, activeTab, setActiveTab, sharedFeed, isLoading } = useApp();
   const [fabOpen, setFabOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [friendsOpen, setFriendsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [sharedFeedOpen, setSharedFeedOpen] = useState(false);
 
   const unreadNotifs = data.notifications.filter(n => !n.read).length;
+  const unreadFeed = sharedFeed.filter(i => !i.read).length;
+
+  if (isLoading) {
+    return (
+      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="text-center">
+          <Loader2 size={40} className="animate-spin mx-auto mb-3" style={{ color: 'var(--accent)' }} />
+          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Yükleniyor...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
       {/* HEADER */}
       <header className="app-header">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center" style={{
+          <div className="flex items-center justify-center overflow-hidden" style={{
             width: 40, height: 40, borderRadius: 14,
             background: 'linear-gradient(135deg, var(--accent), #f59e0b)',
             boxShadow: '0 4px 20px rgba(249,115,22,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
           }}>
-            <Crown size={20} color="#fff" />
+            <img
+              src="/icon-192x192.png"
+              alt="DostOS"
+              style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 14 }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+                (e.target as HTMLImageElement).parentElement!.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 5-4-7-4 7-6-5z"/></svg>';
+              }}
+            />
           </div>
           <div>
             <span className="font-extrabold text-lg tracking-tight" style={{ color: 'var(--text-primary)' }}>
@@ -53,6 +75,18 @@ export default function AppShell() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {/* Arkadaş paylaşımları butonu */}
+          <button
+            className="action-btn"
+            onClick={() => setSharedFeedOpen(true)}
+            title="Arkadaş Paylaşımları"
+            style={{ position: 'relative' }}
+          >
+            <Inbox size={18} />
+            {unreadFeed > 0 && (
+              <span className="badge" style={{ background: 'var(--blue)' }}>{unreadFeed}</span>
+            )}
+          </button>
           <button className="action-btn" onClick={() => setFriendsOpen(true)} title="Arkadaşlar">
             <Users size={18} />
           </button>
@@ -122,6 +156,7 @@ export default function AppShell() {
       {notifOpen && <NotifModal onClose={() => setNotifOpen(false)} />}
       {friendsOpen && <FriendsModal onClose={() => setFriendsOpen(false)} />}
       {profileOpen && <ProfileModal onClose={() => setProfileOpen(false)} />}
+      {sharedFeedOpen && <SharedFeedModal onClose={() => setSharedFeedOpen(false)} />}
     </div>
   );
 }

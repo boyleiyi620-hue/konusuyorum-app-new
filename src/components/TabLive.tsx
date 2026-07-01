@@ -3,7 +3,7 @@ import { useApp } from '@/context/AppContext';
 import { Zap, Music, Gamepad2, Images, Plus, ThumbsUp, MessageCircle, Trash2 } from 'lucide-react';
 
 export default function TabLive() {
-  const { data, setData, addNotification, escapeHtml, currentUser } = useApp();
+  const { data, setData, addNotification, escapeHtml, currentUser, sendToFriends, friends, saveData } = useApp();
   const [showFeedAdd, setShowFeedAdd] = useState(false);
   const [showMusicAdd, setShowMusicAdd] = useState(false);
   const [showGameAdd, setShowGameAdd] = useState(false);
@@ -14,19 +14,24 @@ export default function TabLive() {
   const [albumForm, setAlbumForm] = useState({ name: '', emoji: '📷' });
   const [openAlbum, setOpenAlbum] = useState<string | null>(null);
 
-  const addFeed = () => {
+  const addFeed = async () => {
     if (!feedForm.text.trim()) return;
     const author = feedForm.author || currentUser?.displayName || currentUser?.username || 'Anonim';
     const newPost = {
       id: Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
       author,
       text: feedForm.text,
-      time: 'Şimdi',
+      time: new Date().toLocaleString('tr-TR'),
       color: feedForm.color || 'var(--gold-dim)',
       avatar: author[0],
     };
-    setData(prev => ({ ...prev, feed: [...prev.feed, newPost] }));
+    const updated = { ...data, feed: [...data.feed, newPost] };
+    setData(updated);
+    await saveData(updated);
     addNotification(`📝 ${author} yeni bir gönderi paylaştı.`);
+    if (friends.length > 0) {
+      await sendToFriends('feed', { ...newPost, authorUsername: currentUser?.username });
+    }
     setFeedForm({ author: '', text: '', color: 'var(--gold-dim)' });
     setShowFeedAdd(false);
   };
@@ -40,11 +45,17 @@ export default function TabLive() {
     setShowMusicAdd(false);
   };
 
-  const addGame = () => {
+  const addGame = async () => {
     if (!gameForm.name.trim()) return;
     const newGame = { id: Date.now().toString(36) + Math.random().toString(36).substring(2, 6), ...gameForm, players: Number(gameForm.players) || 0, participants: [] };
-    setData(prev => ({ ...prev, games: [...prev.games, newGame] }));
+    const updated = { ...data, games: [...data.games, newGame] };
+    setData(updated);
+    await saveData(updated);
     addNotification(`🎮 "${gameForm.name}" turnuvası oluşturuldu.`);
+    if (friends.length > 0) {
+      await sendToFriends('game', { title: gameForm.name, location: gameForm.location, players: gameForm.players, icon: gameForm.icon });
+      addNotification(`📨 Oyun daveti ${friends.length} arkadaşına gönderildi!`);
+    }
     setGameForm({ name: '', players: '', location: '', icon: '🎮', status: 'Planlandı' });
     setShowGameAdd(false);
   };
