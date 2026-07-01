@@ -166,7 +166,11 @@ export default function FriendsModal({ onClose }: { onClose: () => void }) {
                       <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>@{u.username}</div>
                     </div>
                     <button className="p-2 rounded-lg hover:bg-orange-500/10 transition-colors" style={{ color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer' }}
-                      onClick={() => { setSearchUser(u.username); }}><UserPlus size={16} /></button>
+                      onClick={async () => { 
+                      const ok = await sendFriendRequest(u.username);
+                      if (ok) setMsg(`@${u.username} için istek gönderildi!`);
+                      else setMsg('İstek gönderilemedi.');
+                    }}><UserPlus size={16} /></button>
                   </div>
                 ))
               )}

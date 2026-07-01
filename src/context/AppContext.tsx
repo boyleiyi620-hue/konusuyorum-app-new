@@ -407,7 +407,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         .eq('password', password)
         .single();
 
-      if (error || !users) return false;
+      if (error || !users) {
+        console.error('Supabase login error:', error);
+        return false;
+      }
 
       const user: User = {
         id: users.id,
@@ -454,7 +457,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         .select()
         .single();
 
-      if (error || !newUser) return false;
+      if (error || !newUser) {
+        console.error('Supabase register error:', error);
+        return false;
+      }
 
       // Create app_data entry
       await supabase
@@ -476,6 +482,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       setCurrentUser(user);
       localStorage.setItem(SESSION_KEY, JSON.stringify(user));
+      // Refresh users list
+      loadAllUsers();
       return true;
     } catch (error) {
       console.error('Register error:', error);
@@ -536,12 +544,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const sendToFriends = useCallback(async (type: string, content: object) => {
     if (!currentUser) return;
 
-    const currentFriends = friendsRef.current;
-    if (currentFriends.length === 0) return;
+    // Use friends state directly for better reliability
+    if (friends.length === 0) return;
 
     try {
       // Tüm arkadaşlara gönder
-      const inserts = currentFriends.map(friend => ({
+      const inserts = friends.map(friend => ({
         from_user_id: currentUser.id,
         to_user_id: friend.userId,
         type,
@@ -554,11 +562,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         read: false,
       }));
 
-      await supabase.from('shared_feed').insert(inserts);
+      const { error } = await supabase.from('shared_feed').insert(inserts);
+      if (error) throw error;
     } catch (error) {
       console.error('Error sending to friends:', error);
     }
-  }, [currentUser]);
+  }, [currentUser, friends]);
 
   const markFeedRead = useCallback(async (itemId: string) => {
     try {

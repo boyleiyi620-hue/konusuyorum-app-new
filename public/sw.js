@@ -1,15 +1,15 @@
-const CACHE_NAME = 'dostos-app-v3';
+const CACHE_NAME = 'dostos-app-v4';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
-  '/icon-192x192-maskable.png',
-  '/icon-512x512-maskable.png',
-  '/apple-touch-icon.png',
-  '/favicon-32x32.png',
-  '/favicon-16x16.png'
+  './',
+  'index.html',
+  'manifest.json',
+  'icon-192x192.png',
+  'icon-512x512.png',
+  'icon-192x192-maskable.png',
+  'icon-512x512-maskable.png',
+  'apple-touch-icon.png',
+  'favicon-32x32.png',
+  'favicon-16x16.png'
 ];
 
 self.addEventListener('install', event => {
