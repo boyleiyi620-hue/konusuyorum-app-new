@@ -3,22 +3,15 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import { inspectAttr } from 'kimi-plugin-inspect-react'
 
-// https://vite.dev/config/
 export default defineConfig({
-  base: './', // Göreli yollar PWA ikonları için bazen daha kararlıdır
-  build: {
-    assetsInlineLimit: 10000000,
-  },
+  base: '/', // Vercel/Netlify/GitHub Pages (custom domain) için en iyisi budur
   plugins: [inspectAttr(), react()],
-  server: {
-    port: 3000,
-    headers: {
-      'Service-Worker-Allowed': '/',
-    },
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    assetsInlineLimit: 0, // İkonların base64 olmasını engelle
+  }
 });
