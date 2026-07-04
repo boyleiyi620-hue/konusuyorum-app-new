@@ -2,9 +2,9 @@
   "name": "DostOS",
   "short_name": "DostOS",
   "description": "DostOS - Arkadaşlık ve sosyal işletim sistemi uygulaması",
-  "id": "https://boyleiyi620-hue.github.io/dostos-app-new/",
-  "start_url": "https://boyleiyi620-hue.github.io/dostos-app-new/",
-  "scope": "https://boyleiyi620-hue.github.io/dostos-app-new/",
+  "id": "/dostos-app-new/",
+  "start_url": "/dostos-app-new/",
+  "scope": "/dostos-app-new/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1a1a1a",
@@ -15,55 +15,61 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-72x72.png",
+      "src": "./icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-96x96.png",
+      "src": "./icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-128x128.png",
+      "src": "./icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-144x144.png",
+      "src": "./icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-152x152.png",
+      "src": "./icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-192x192.png",
+      "src": "./icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-384x384.png",
+      "src": "./icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-512x512.png",
+      "src": "./icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-maskable-512x512.png",
+      "src": "./icon-192x192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icon-512x512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -71,7 +77,7 @@
   ],
   "screenshots": [
     {
-      "src": "https://boyleiyi620-hue.github.io/dostos-app-new/icon-512x512.png",
+      "src": "./icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
